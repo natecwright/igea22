@@ -2,47 +2,51 @@
 library(dplyr)
 library(readxl)
 
-setwd('C:/Users/ncw02/Downloads/IGEA/')
+setwd('/Users/emmaboudreau/Documents/GitHub/igea22/')
 
 # read in data ----------
 # setwd (path to the data)
+#read in total station excel
 
-total_station_1 = read_xlsx('raw_ts_data/field_data_3.xlsx',
-                    sheet = 1)
+ts1_excel = read_xlsx('raw_ts_data/fd/fd3_ts1.xlsx')%>%
+  mutate(TS_code  = "TS1")
 
 
-total_station_2 = read_xlsx('C:/Users/ncw02/Downloads/Temp/fielddata2.xlsx',
-                            sheet = 2)
-
-metadata_in = read_xlsx('C:/Users/ncw02/Downloads/Temp/fielddata2.xlsx',
-                        sheet = 3)
-
-ts_number1 = read.delim("C:/Users/ncw02/Downloads/Temp/ts1.txt",
+ts2_excel = read_xlsx('raw_ts_data/fd/fd3_ts2.xlsx')%>%
+  mutate(TS_code  = "TS2")
+#read in metadata
+metadata_excel = read_xlsx('raw_ts_data/fd/fd3_metadata.xlsx')
+#read in reach code
+ts1_reach = read.delim("raw_ts_data/group3/ep7_ts1.txt",
                        skip = 11, header = FALSE, nrows= 1, dec = ".", sep = '\t')%>%
   transmute(Reach = strsplit(V1, " +")[[1]][3])
 
 
-ts_number2 = read.delim("C:/Users/ncw02/Downloads/Temp/ts2.txt",
+ts2_reach = read.delim("raw_ts_data/group3/ep7_ts2.txt",
                         skip = 11, header = FALSE, nrows= 1, dec = ".", sep = '\t')%>%
   transmute(Reach = strsplit(V1, " +")[[1]][3])
 
-ts1_elev = read.delim("C:/Users/ncw02/Downloads/Temp/ts1.txt",
+ts1_txt = read.delim("raw_ts_data/group3/ep7_ts1.txt",
                       skip = 17, header = TRUE, nrows= 70, dec = ".", sep = ',')%>%
   mutate(TS_code = "TS1")%>%
-  mutate(Reach = ts_number1$Reach)
+  mutate(Reach = ts1_reach$Reach)
 
   
-ts2_elev = read.delim("C:/Users/ncw02/Downloads/Temp/ts2.txt",
+ts2_txt = read.delim("raw_ts_data/group3/ep7_ts2.txt",
                       skip = 17, header = TRUE, nrows= 70, dec = ".", sep = ',')%>%
   mutate(TS_code = "TS2")%>%
-  mutate(Reach = ts_number2$Reach)
+  mutate(Reach = ts2_reach$Reach)
 
+ts_excel_df = rbind(ts1_excel,ts2_excel)
+
+#where emma left off at 9/29
 
 # -------------------
 
 
+
 # test a join ----
-joined_df = left_join(total_station_1, metadata_in, by='Reach')%>%
+joined_df = left_join(ts1_excel, metadata_excel, by='Reach')%>%
   filter(Reach == 'E7')%>%
   select('Reach', 'Point ID', 'Elevation')
 
