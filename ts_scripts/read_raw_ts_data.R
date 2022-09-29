@@ -9,11 +9,14 @@ setwd('/Users/emmaboudreau/Documents/GitHub/igea22/')
 #read in total station excel
 
 ts1_excel = read_xlsx('raw_ts_data/fd/fd3_ts1.xlsx')%>%
-  mutate(TS_code  = "TS1")
+  mutate(TS_code  = "TS1")%>%
+  filter(Reach == "3EP7") #specified reach
 
 
 ts2_excel = read_xlsx('raw_ts_data/fd/fd3_ts2.xlsx')%>%
-  mutate(TS_code  = "TS2")
+  mutate(TS_code  = "TS2")%>%
+  filter(Reach == "3EP7") #specified reach
+  
 #read in metadata
 metadata_excel = read_xlsx('raw_ts_data/fd/fd3_metadata.xlsx')
 #read in reach code
@@ -39,6 +42,11 @@ ts2_txt = read.delim("raw_ts_data/group3/ep7_ts2.txt",
 
 ts_excel_df = rbind(ts1_excel,ts2_excel)
 
+ts_txt_df = rbind(ts1_txt,ts2_txt)
+
+#created data frame with excel and text file for specific reach
+joined_excel_txt_df = left_join(ts_excel_df, ts_txt_df, by=c('Reach', 'TS_code', 'PointID'))
+
 #where emma left off at 9/29
 
 # -------------------
@@ -46,11 +54,11 @@ ts_excel_df = rbind(ts1_excel,ts2_excel)
 
 
 # test a join ----
-joined_df = left_join(ts1_excel, metadata_excel, by='Reach')%>%
-  filter(Reach == 'E7')%>%
-  select('Reach', 'Point ID', 'Elevation')
+#joined_df = left_join(ts1_excel, metadata_excel, by='Reach')%>%
+  #filter(Reach == 'E7')%>%
+  #select('Reach', 'Point ID', 'Elevation')
 
-combined_df = rbind(ts1_elev, ts2_elev)
+#combined_df = rbind(ts1_elev, ts2_elev)
 
 #plot(joined_df$'Point ID', joined_df$Elevation)
 
