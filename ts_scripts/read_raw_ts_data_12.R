@@ -2,7 +2,7 @@
 library(dplyr)
 library(readxl)
 
-setwd('C:/Users/ncw02/Downloads/IGEA/')
+setwd('/Users/emmaboudreau/Documents/GitHub/igea22/')
 
 # read in data ----------
 # setwd (path to the data)
