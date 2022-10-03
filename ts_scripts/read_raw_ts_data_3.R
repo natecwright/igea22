@@ -9,12 +9,12 @@ setwd('C:/Users/ncw02/Downloads/IGEA/')
 #read in total station excel
 
 ts1_excel = read_xlsx('raw_ts_data/fd/fd3_ts1.xlsx')%>%
-  mutate(TS_code  = "TS1")%>%
+  mutate(TS_code  = "1")%>%
   filter(Reach == "3EP7") #specified reach
 
 
 ts2_excel = read_xlsx('raw_ts_data/fd/fd3_ts2.xlsx')%>%
-  mutate(TS_code  = "TS2")%>%
+  mutate(TS_code  = "2")%>%
   filter(Reach == "3EP7") #specified reach
   
 #read in metadata
@@ -31,13 +31,13 @@ ts2_reach = read.delim("raw_ts_data/group3/ep7_ts2.txt",
 
 ts1_txt = read.delim("raw_ts_data/group3/ep7_ts1.txt",
                       skip = 17, header = TRUE, nrows= 70, dec = ".", sep = ',')%>%
-  mutate(TS_code = "TS1")%>%
+  mutate(TS_code = "1")%>%
   mutate(Reach = ts1_reach$Reach)
 
   
 ts2_txt = read.delim("raw_ts_data/group3/ep7_ts2.txt",
                       skip = 17, header = TRUE, nrows= 70, dec = ".", sep = ',')%>%
-  mutate(TS_code = "TS2")%>%
+  mutate(TS_code = "2")%>%
   mutate(Reach = ts2_reach$Reach)
 
 ts_excel_df = rbind(ts1_excel,ts2_excel)
