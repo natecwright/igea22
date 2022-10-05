@@ -1,6 +1,9 @@
 # script to read in basic data and look at it
 library(dplyr)
 library(readxl)
+library(tidyr)
+#install.packages("stringr")
+library("stringr")
 
 setwd('/Users/emmaboudreau/Documents/GitHub/igea22/')
 
@@ -45,19 +48,33 @@ ts_excel_df = rbind(ts1_excel,ts2_excel)
 ts_txt_df = rbind(ts1_txt,ts2_txt)
 
 #created data frame with excel and text file for specific reach
-joined_excel_txt_df = left_join(ts_excel_df, ts_txt_df, by=c('Reach', 'TS_code', 'PointID')) 
-  joined_excel_txt_df$uniqueID = paste(joined_excel_txt_df$Reach,joined_excel_txt_df$TS_code,joined_excel_txt_df$Location,joined_excel_txt_df$XSection) 
-  joined_excel_txt_df$AP = substr(joined_excel_txt_df$uniqueID,9,9)
-  #sub([9],"",joined_excel_txt_df$uniqueID)
+joined_excel_txt_df = left_join(ts_excel_df, ts_txt_df, by=c('Reach', 'TS_code', 'PointID')) %>%
+  mutate(uniqueID = paste(Reach,TS_code,Location,XSection)) %>%
+  mutate(AP = substr(uniqueID,9,9)) %>%
+    pivot_wider(names_from = AP, values_from = Elevation) %>%
+  mutate(ID = str_replace_all(uniqueID,"A","")) %>%
+  mutate(ID = str_replace_all(ID,"P",""))%>%
+  group_by(ID)%>%
+  mutate(delta_elev = sum(A,na.rm=T)-sum(P,na.rm=T))
+#sum is used because there are two A (and P) values for each ID one is an elevation and the other is an NA
+#,na.rm=T tells the script to ignore the NA and continue with calculation
+  
 
 #where emma left off at 9
 
 
 # -------------------
-
-elev_df = select('AP','uniqueID','Elevation') %>%
-    filter(AP == 'P')
-  
+# P_df = select(joined_excel_txt_df, AP, uniqueID, Elevation) %>%
+#     filter(AP == 'P') %>%
+#     mutate(ID = str_replace_all(uniqueID,"P",""))
+# 
+# A_df = select(joined_excel_txt_df, AP, uniqueID, Elevation) %>%
+#   filter(AP == 'A') %>%
+# mutate(ID = str_replace_all(uniqueID,"A",""))
+# 
+# AP_df = rbind(P_df, A_df, by=c('ID')) %>%
+#   #pivot_wider(names_from = AP, values_from = Elevation)
+# 
 
 # test a join ----
 #joined_df = left_join(ts1_excel, metadata_excel, by='Reach')%>%
