@@ -46,14 +46,18 @@ ts_txt_df = rbind(ts1_txt,ts2_txt)
 
 #created data frame with excel and text file for specific reach
 joined_excel_txt_df = left_join(ts_excel_df, ts_txt_df, by=c('Reach', 'TS_code', 'PointID')) 
-  joined_excel_txt_df$uniqueID = paste(joined_excel_txt_df$Reach,joined_excel_txt_df$TS_code,joined_excel_txt_df$Location,joined_excel_txt_df$PointID,joined_excel_txt_df$XSection) 
+  joined_excel_txt_df$uniqueID = paste(joined_excel_txt_df$Reach,joined_excel_txt_df$TS_code,joined_excel_txt_df$Location,joined_excel_txt_df$XSection) 
   joined_excel_txt_df$AP = substr(joined_excel_txt_df$uniqueID,9,9)
+  #sub([9],"",joined_excel_txt_df$uniqueID)
 
-#where emma left off at 9/29
+#where emma left off at 9
+
 
 # -------------------
 
-
+elev_df = select('AP','uniqueID','Elevation') %>%
+    filter(AP == 'P')
+  
 
 # test a join ----
 #joined_df = left_join(ts1_excel, metadata_excel, by='Reach')%>%
