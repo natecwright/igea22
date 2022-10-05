@@ -8,8 +8,8 @@ setwd('C:/Users/ncw02/Downloads/IGEA/')
 # setwd (path to the data)
 
 ts1_excel = read_xlsx('raw_ts_data/fd/fd12_ts1.xlsx')%>%
-  mutate(TS_code  = "1")%>%
-  mutate('Cross section'= Xsection)
+  mutate(TS_code  = "1")#%>%
+  #mutate('Cross section'= Xsection)
 
 ts2_excel = read_xlsx('raw_ts_data/fd/fd12_ts2.xlsx')%>%
   mutate(TS_code  = "2")
@@ -57,9 +57,8 @@ joined_df3 = left_join(joined_df1, ts1_txt, by=c('Reach','PointID','TS_code'))
 joined_df4 = left_join(joined_df2, ts2_txt, by=c('Reach','PointID','TS_code'))
 
 # this joins both ts1 and ts2 data to complete the entire reach
-combined_df = rbind(joined_df3, joined_df4)
-
-mutate(combined_df$UID == paste(combined_df$'Reach', combined_df$'PointID', combined_df$'Location', combined_df$'Cross section', combined_df$'TS_code'))
+combined_df = rbind(joined_df3, joined_df4)#%>%
+  #mutate(UID == paste(Reach, PointID, Location, Xsection, TS_code)
 
 
 # -------
