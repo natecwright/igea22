@@ -60,7 +60,11 @@ joined_df4 = left_join(joined_df2, ts2_txt, by=c('Reach','PointID','TS_code'))
 
 # this joins both ts1 and ts2 data to complete the entire reach
 ep7 = rbind(joined_df3, joined_df4)%>%
-  mutate(uniqueID = paste0(Reach, PointID, Location, Cross.section, TS_code))
+  mutate(uniqueID = paste0(Reach, PointID, Location, Cross.section, TS_code))#%>%
+  #mutate()
+
+#UID2 = strsplit(ep7$Location, split = "")[2]
+#separate(ep7$Location, Location, sep = "[^[:alnum:]]+", remove = TRUE, convert = FALSE)
 
 
 # -------
@@ -71,11 +75,11 @@ ep7$type = substr(ep7$uniqueID,7,7)
 
 a_df = select(ep7, uniqueID, type, Elevation.y)%>%
   filter(type =='A')
-s
+
 p_df = select(ep7, uniqueID, type, Elevation.y)%>%
   filter(type == 'P')
 
-
+saveRDS(ep7, 'outputs/ep7.rds')
 
 
 # --------
