@@ -1,6 +1,8 @@
 # script to read in basic data and look at it
 library(dplyr)
 library(readxl)
+library(tidyr)
+library(stringr)
 
 setwd('C:/Users/ncw02/Downloads/IGEA/')
 
@@ -60,24 +62,36 @@ joined_df4 = left_join(joined_df2, ts2_txt, by=c('Reach','PointID','TS_code'))
 
 # this joins both ts1 and ts2 data to complete the entire reach
 ep7 = rbind(joined_df3, joined_df4)%>%
-  mutate(uniqueID = paste0(Reach, PointID, Location, Cross.section, TS_code))#%>%
-  #mutate()
+  mutate(uniqueID = paste0(Reach, PointID, Location, Cross.section, TS_code))%>%
+  mutate(LRW = substr(uniqueID,6,6))%>%
+  mutate(Type = substr(uniqueID,7,7))%>%
+  mutate(Number = substr(uniqueID,8,8))%>%
+  mutate(UID2 = paste0(Reach, PointID, LRW, Number, Cross.section, TS_code))
 
-#UID2 = strsplit(ep7$Location, split = "")[2]
-#separate(ep7$Location, Location, sep = "[^[:alnum:]]+", remove = TRUE, convert = FALSE)
+#split the location
+#ep7[c('LRW', 'AP', 'Number')] = str_split_fixed(ep7$Location, '', 3)
+#mutate(ep7$UID2 = paste0(Reach, PointID, LRW, Number, Cross.section, TS_code))
+
 
 
 # -------
 
-# separate A's and P's duuude ----
+# separate A's and P's  ----
 
-ep7$type = substr(ep7$uniqueID,7,7)
 
-a_df = select(ep7, uniqueID, type, Elevation.y)%>%
-  filter(type =='A')
 
-p_df = select(ep7, uniqueID, type, Elevation.y)%>%
-  filter(type == 'P')
+
+a_df = select(ep7, uniqueID, Type, Elevation.y, UID2)%>%
+  filter(Type =='A')%>% 
+  rename("Code" = "Type")
+
+
+p_df = select(ep7, uniqueID, Type, Elevation.y, UID2)%>%
+  filter(Type == 'P')%>% 
+  rename("Code" = "Type")
+
+final1 = left_join(a_df, p_df, by='UID2')
+#final2 = left_join(ep7, p_df, by='UID2')
 
 saveRDS(ep7, 'outputs/ep7.rds')
 
