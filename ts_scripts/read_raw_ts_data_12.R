@@ -66,7 +66,7 @@ ep7 = rbind(joined_df3, joined_df4)%>%
   mutate(LRW = substr(uniqueID,6,6))%>%
   mutate(Type = substr(uniqueID,7,7))%>%
   mutate(Number = substr(uniqueID,8,8))%>%
-  mutate(UID2 = paste0(Reach, PointID, LRW, Number, Cross.section, TS_code))
+  mutate(UID2 = paste0(Reach, LRW, Number, Cross.section, TS_code))
 
 #split the location
 #ep7[c('LRW', 'AP', 'Number')] = str_split_fixed(ep7$Location, '', 3)
@@ -81,19 +81,24 @@ ep7 = rbind(joined_df3, joined_df4)%>%
 
 
 
-a_df = select(ep7, uniqueID, Type, Elevation.y, UID2)%>%
+a_df = select(ep7, UID2, Type, Elevation.y)%>%
   filter(Type =='A')%>% 
-  rename("Code" = "Type")
+  rename("Active" = "Type")%>% 
+  rename("ElevationA" = "Elevation.y")%>%
+  mutate(ElevationA = as.double(str_remove_all(ElevationA, ' ')))
 
 
-p_df = select(ep7, uniqueID, Type, Elevation.y, UID2)%>%
+p_df = select(ep7, UID2, Type, Elevation.y)%>%
   filter(Type == 'P')%>% 
-  rename("Code" = "Type")
+  rename("Permafrost" = "Type")%>% 
+  rename("ElevationP" = "Elevation.y")%>%
+  mutate(ElevationP = as.double(str_remove_all(ElevationP, ' ')))
 
-final1 = left_join(a_df, p_df, by='UID2')
-#final2 = left_join(ep7, p_df, by='UID2')
+final = left_join(a_df, p_df, by='UID2')%>%
+  mutate(ALT = (ElevationA-ElevationP))
 
 saveRDS(ep7, 'outputs/ep7.rds')
+saveRDS(final, 'outputs/ALT.rds')
 
 
 # --------
