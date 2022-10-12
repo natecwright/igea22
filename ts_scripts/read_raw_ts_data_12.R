@@ -15,8 +15,9 @@ ts1_excel = read_xlsx('raw_ts_data/fd/fd12_ts1.xlsx')%>%
 ts2_excel = read_xlsx('raw_ts_data/fd/fd12_ts2.xlsx')%>%
   mutate(TS_code  = "2")
 
-names(ts1_excel) <- make.names(names(ts1_excel), unique=TRUE)
-names(ts2_excel) <- make.names(names(ts2_excel), unique=TRUE)
+# rename column names
+names(ts1_excel) = make.names(names(ts1_excel), unique=TRUE)
+names(ts2_excel) = make.names(names(ts2_excel), unique=TRUE)
 
 
 metadata_excel = read_xlsx('raw_ts_data/fd/fd12_metadata.xlsx')
@@ -46,6 +47,7 @@ ts2_txt = read.delim("raw_ts_data/group12/ep7_ts2.txt",
 
 # -------------------
 
+
 # join data frames ----
 
 # this joins excel (digitized data) with metadata for ts1
@@ -61,6 +63,7 @@ joined_df3 = left_join(joined_df1, ts1_txt, by=c('Reach','PointID','TS_code'))
 joined_df4 = left_join(joined_df2, ts2_txt, by=c('Reach','PointID','TS_code'))
 
 # this joins both ts1 and ts2 data to complete the entire reach
+# creates a unique ID and another unique ID without A's and P's
 ep7 = rbind(joined_df3, joined_df4)%>%
   mutate(uniqueID = paste0(Reach, PointID, Location, Cross.section, TS_code))%>%
   mutate(LRW = substr(uniqueID,6,6))%>%
@@ -68,17 +71,12 @@ ep7 = rbind(joined_df3, joined_df4)%>%
   mutate(Number = substr(uniqueID,8,8))%>%
   mutate(UID2 = paste0(Reach, LRW, Number, Cross.section, TS_code))
 
-#split the location
-#ep7[c('LRW', 'AP', 'Number')] = str_split_fixed(ep7$Location, '', 3)
-#mutate(ep7$UID2 = paste0(Reach, PointID, LRW, Number, Cross.section, TS_code))
-
 
 
 # -------
 
+
 # separate A's and P's  ----
-
-
 
 
 a_df = select(ep7, UID2, Type, Elevation.y)%>%
