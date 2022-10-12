@@ -10,17 +10,20 @@ setwd('C:/Users/ncw02/Downloads/IGEA/')
 # setwd (path to the data)
 
 ts1_excel = read_xlsx('raw_ts_data/fd/fd12_ts1.xlsx')%>%
-  mutate(TS_code  = "1")
+  mutate(TS_code  = "1")%>% 
+  rename("Notebook.notes" = "Notes")
 
 ts2_excel = read_xlsx('raw_ts_data/fd/fd12_ts2.xlsx')%>%
-  mutate(TS_code  = "2")
+  mutate(TS_code  = "2")%>% 
+  rename("Notebook.notes" = "Notes")
 
 # rename column names
 names(ts1_excel) = make.names(names(ts1_excel), unique=TRUE)
 names(ts2_excel) = make.names(names(ts2_excel), unique=TRUE)
 
 
-metadata_excel = read_xlsx('raw_ts_data/fd/fd12_metadata.xlsx')
+metadata_excel = read_xlsx('raw_ts_data/fd/fd12_metadata.xlsx')%>%
+  rename("Sample.elevation" = "Elevation")
 
 # extract reach from txt file for ts1 (should be identical for ts2)
 ts1_reach = read.delim('raw_ts_data/group12/ep7_ts1.txt',
@@ -70,7 +73,7 @@ ep7 = rbind(joined_df3, joined_df4)%>%
   mutate(Type = substr(uniqueID,7,7))%>%
   mutate(Number = substr(uniqueID,8,8))%>%
   mutate(UID2 = paste0(Reach, LRW, Number, Cross.section, TS_code))%>%
-  mutate(Elevation.y = as.double(str_remove_all(Elevation.y, ' ')))
+  mutate(Elevation = as.double(str_remove_all(Elevation, ' ')))
 
 
 
@@ -80,18 +83,18 @@ ep7 = rbind(joined_df3, joined_df4)%>%
 # separate A's and P's  ----
 
 
-a_df = select(ep7, UID2, Type, Elevation.y)%>%
+a_df = select(ep7, UID2, Type, Elevation)%>%
   filter(Type =='A')%>% 
   rename("Active" = "Type")%>% 
-  rename("ElevationA" = "Elevation.y")%>%
+  rename("ElevationA" = "Elevation")
   #mutate(ElevationA = as.double(str_remove_all(ElevationA, ' '))) #removes weird spaces from text file and converts
   # the string to a double
 
 
-p_df = select(ep7, UID2, Type, Elevation.y)%>%
+p_df = select(ep7, UID2, Type, Elevation)%>%
   filter(Type == 'P')%>% 
   rename("Permafrost" = "Type")%>% 
-  rename("ElevationP" = "Elevation.y")%>%
+  rename("ElevationP" = "Elevation")
   #mutate(ElevationP = as.double(str_remove_all(ElevationP, ' '))) #removes weird spaces from text file and converts
 # the string to a double
 
