@@ -3,6 +3,7 @@ library(dplyr)
 library(readxl)
 library(tidyr)
 library(stringr)
+library(stringi)
 
 setwd('C:/Users/ncw02/Downloads/IGEA/')
 
@@ -11,7 +12,8 @@ setwd('C:/Users/ncw02/Downloads/IGEA/')
 
 ts1_excel = read_xlsx('raw_ts_data/fd/fd12_ts1.xlsx')%>%
   mutate(TS_code  = "1")%>% 
-  rename("Notebook.notes" = "Notes")
+  rename("Notebook.notes" = "Notes")%>%
+  mutate(Reach = stri_sub_replace(Reach, 'EP', value ='P'))
 
 ts2_excel = read_xlsx('raw_ts_data/fd/fd12_ts2.xlsx')%>%
   mutate(TS_code  = "2")%>% 
@@ -26,26 +28,37 @@ metadata_excel = read_xlsx('raw_ts_data/fd/fd12_metadata.xlsx')%>%
   rename("Sample.elevation" = "Elevation")
 
 # extract reach from txt file for ts1 (should be identical for ts2)
-ts1_reach = read.delim('raw_ts_data/group12/ep7_ts1.txt',
-                       skip = 13, header = FALSE, nrows= 1, dec = ".", sep = '\t')%>%
-  transmute(Reach = strsplit(V1, " +")[[1]][3])
+ts1_reach = read.delim('raw_ts_data/group12.n/ep7_ts1.txt',
+                       header = FALSE, nrows= 1, dec = ".", sep = '\t')%>%
+  transmute(Reach = V1)
 
 # extract reach from txt file for ts2 (should be identical for ts1)
-ts2_reach = read.delim('raw_ts_data/group12/ep7_ts2.txt',
-                        skip = 14, header = FALSE, nrows= 1, dec = ".", sep = '\t')%>%
-  transmute(Reach = strsplit(V1, " +")[[1]][3])
+ts2_reach = read.delim('raw_ts_data/group12.n/ep7_ts2.txt',
+                        header = FALSE, nrows= 1, dec = ".", sep = '\t')%>%
+  transmute(Reach = V1)
 
 # read in ts1 xyz
-ts1_txt = read.delim("raw_ts_data/group12/ep7_ts1.txt",
-                      skip = 19, header = TRUE, nrows= 113, dec = ".", sep = ',')%>%
+ts1_txt = read.delim("raw_ts_data/group12.n/ep7_ts1.txt",
+                      skip = 1, header = TRUE, dec = ".", sep = ',')%>%
   mutate(TS_code = "1")%>%
-  mutate(Reach = ts1_reach$Reach)
+  mutate(Reach = ts1_reach$Reach)%>%
+  mutate(PointID = as.double(PointID))
+
+# manual intervention to get rid of PT 101 which was being problematic
+ts1_txt = ts1_txt[2:nrow(ts1_txt),]
+
 
 # read in ts2 xyz
-ts2_txt = read.delim("raw_ts_data/group12/ep7_ts2.txt",
-                      skip = 20, header = TRUE, nrows= 122, dec = ".", sep = ',')%>%
+ts2_txt = read.delim("raw_ts_data/group12.n/ep7_ts2.txt",
+                      skip = 1, header = TRUE, dec = ".", sep = ',')%>%
   mutate(TS_code = "2")%>%
-  mutate(Reach = ts2_reach$Reach)
+  mutate(Reach = ts2_reach$Reach)%>%
+  mutate(PointID = as.double(PointID))
+
+
+# manual intervention to get rid of PT 101 which was being problematic
+ts2_txt = ts2_txt[2:nrow(ts2_txt),]
+
 
 
 # -------------------
