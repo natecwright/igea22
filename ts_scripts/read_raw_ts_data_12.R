@@ -69,7 +69,8 @@ ep7 = rbind(joined_df3, joined_df4)%>%
   mutate(LRW = substr(uniqueID,6,6))%>%
   mutate(Type = substr(uniqueID,7,7))%>%
   mutate(Number = substr(uniqueID,8,8))%>%
-  mutate(UID2 = paste0(Reach, LRW, Number, Cross.section, TS_code))
+  mutate(UID2 = paste0(Reach, LRW, Number, Cross.section, TS_code))%>%
+  mutate(Elevation.y = as.double(str_remove_all(Elevation.y, ' ')))
 
 
 
@@ -83,15 +84,19 @@ a_df = select(ep7, UID2, Type, Elevation.y)%>%
   filter(Type =='A')%>% 
   rename("Active" = "Type")%>% 
   rename("ElevationA" = "Elevation.y")%>%
-  mutate(ElevationA = as.double(str_remove_all(ElevationA, ' ')))
+  #mutate(ElevationA = as.double(str_remove_all(ElevationA, ' '))) #removes weird spaces from text file and converts
+  # the string to a double
 
 
 p_df = select(ep7, UID2, Type, Elevation.y)%>%
   filter(Type == 'P')%>% 
   rename("Permafrost" = "Type")%>% 
   rename("ElevationP" = "Elevation.y")%>%
-  mutate(ElevationP = as.double(str_remove_all(ElevationP, ' ')))
+  #mutate(ElevationP = as.double(str_remove_all(ElevationP, ' '))) #removes weird spaces from text file and converts
+# the string to a double
 
+
+# joins active layer df and permafrost layer df and creates a new column with elevation difference
 final = left_join(a_df, p_df, by='UID2')%>%
   mutate(ALT = (ElevationA-ElevationP))
 
