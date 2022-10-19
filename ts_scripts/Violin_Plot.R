@@ -21,7 +21,7 @@ p3=ggplot(ep7_elev)+
                geom = "crossbar",
                width = 0.5)+
   theme_bw()+ #gets rid of grey background
-  xlab('LRW')+
+  xlab('Distance from Bank')+
   ylab('Active Layer Thickness(m)')+
   labs(colour = 'LRW')+ #title of the legend
   theme(legend.text=element_text(size=14),
