@@ -133,6 +133,18 @@ mean2 = mean(water$ALT)
 # ----
 
 
+# ----
+
+new_df = final%>%
+  filter(LRW == 'W')%>%
+  mutate(Temp = paste0(LRW, Number))%>%
+  filter(Temp != 'W2')%>%
+  filter(Temp != 'W4')
+
+temp_df = new_df%>%
+  filter(Cross.section == '3' | Cross.section == '8')
+
+#----
 
 
 
