@@ -5,7 +5,7 @@ library(tidyr)
 library(stringr)
 library(stringi)
 
-setwd('/Users/emmaboudreau/Documents/GitHub/igea22/')
+setwd('C:/Users/ncw02/Downloads/IGEA/')
 
 # read in data ----------
 # setwd (path to the data)
@@ -95,7 +95,7 @@ ep7 = rbind(joined_df3, joined_df4)%>%
 # separate A's and P's  ----
 
 
-a_df = select(ep7, UID2, Type, Elevation)%>%
+a_df = select(ep7, UID2, Type, LRW, Elevation)%>%
   filter(Type =='A')%>% 
   rename("Active" = "Type")%>% 
   rename("ElevationA" = "Elevation")
@@ -103,7 +103,7 @@ a_df = select(ep7, UID2, Type, Elevation)%>%
   # the string to a double
 
 
-p_df = select(ep7, UID2, Type, Elevation)%>%
+p_df = select(ep7, UID2, Type, LRW, Elevation)%>%
   filter(Type == 'P')%>% 
   rename("Permafrost" = "Type")%>% 
   rename("ElevationP" = "Elevation")
@@ -112,7 +112,7 @@ p_df = select(ep7, UID2, Type, Elevation)%>%
 
 
 # joins active layer df and permafrost layer df and creates a new column with elevation difference
-final = left_join(a_df, p_df, by='UID2')%>%
+final = left_join(a_df, p_df, by=c('UID2','LRW'))%>%
   mutate(ALT = (ElevationA-ElevationP))
 
 saveRDS(ep7, 'outputs/ep7.rds')
@@ -120,6 +120,17 @@ saveRDS(final, 'outputs/ALT.rds')
 
 
 # --------
+
+
+# do some calcs ----
+mean = mean(final$ALT)
+water = final%>%
+  filter(LRW =='W')
+
+mean2 = mean(water$ALT)
+
+
+# ----
 
 
 
