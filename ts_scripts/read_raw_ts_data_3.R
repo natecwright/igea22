@@ -36,12 +36,19 @@ ts1_txt = read.delim("raw_ts_data/group3.n/ep7_ts1.txt",
   mutate(Reach = ts1_reach$Reach)%>%
   mutate(PointID=as.double(PointID))
 
+# manual intervention to get rid of PT 101 which was being problematic
+ts1_txt = ts1_txt[2:nrow(ts1_txt),]
+
   
 ts2_txt = read.delim("raw_ts_data/group3.n/ep7_ts2.txt",
                       skip = 1, header = TRUE, dec = ".", sep = ',')%>%
   mutate(TS_code = "2")%>%
   mutate(Reach = ts2_reach$Reach)%>%
   mutate(PointID=as.double(PointID))
+
+# manual intervention to get rid of PT 101 which was being problematic
+ts2_txt = ts2_txt[2:nrow(ts2_txt),]
+
 #----
 
 ts_excel_df = rbind(ts1_excel,ts2_excel)
@@ -52,43 +59,40 @@ ts_txt_df = rbind(ts1_txt,ts2_txt)
 
 
 #created data frame with excel and text file for specific reach
-joined_excel_txt_df = left_join(ts_excel_df, ts_txt_df, by=c('Reach', 'TS_code', 'PointID')) %>%
-  mutate(uniqueID = paste(Reach,TS_code,Location,XSection)) %>%
-  mutate(AP = substr(uniqueID,9,9)) 
-  #mutate(LWR=substr(uniqueID,))
-    #pivot_wider(names_from = AP, values_from = Elevation) %>%
-  #mutate(ID = str_replace_all(uniqueID,"A","")) %>%
-  #mutate(ID = str_replace_all(ID,"P",""))%>%
-  #group_by(ID)%>%
-  #mutate(delta_elev = sum(A,na.rm=T)-sum(P,na.rm=T))
-#sum is used because there are two A (and P) values for each ID one is an elevation and the other is an NA
-#,na.rm=T tells the script to ignore the NA and continue with calculation
+joined_excel_txt_df = left_join(ts_excel_df, ts_txt_df, by=c('Reach', 'TS_code', 'PointID'))%>%
+  mutate(uniqueID = paste(Reach,TS_code,Location,XSection))%>%
+  mutate(AP = substr(uniqueID,9,9))%>%
+  mutate(LWR = substr(uniqueID,8,8))%>%
+  mutate(number = substr(uniqueID,10,10))%>%
+  mutate(UID2 = paste0(Reach,TS_code,LWR,number,XSection))%>%
+  mutate(Elevation = as.double(str_remove_all(Elevation, ' ')))
+joined2_excel_txt_df = joined_excel_txt_df[!(joined_excel_txt_df$PointID==101),] #removing 101 from excel
+#!means not
+  
   
 
-#where emma left off at 9
+a_df = select(joined_excel_txt_df, UID2, AP, LWR, Elevation)%>%
+  filter(AP =='A')%>% 
+  rename("Active" = "AP")%>% 
+  rename("ElevationA" = "Elevation")
 
 
-# -------------------
-# P_df = select(joined_excel_txt_df, AP, uniqueID, Elevation) %>%
-#     filter(AP == 'P') %>%
-#     mutate(ID = str_replace_all(uniqueID,"P",""))
-# 
-# A_df = select(joined_excel_txt_df, AP, uniqueID, Elevation) %>%
-#   filter(AP == 'A') %>%
-# mutate(ID = str_replace_all(uniqueID,"A",""))
-# 
-# AP_df = rbind(P_df, A_df, by=c('ID')) %>%
-#   #pivot_wider(names_from = AP, values_from = Elevation)
-# 
 
-# test a join ----
-#joined_df = left_join(ts1_excel, metadata_excel, by='Reach')%>%
-  #filter(Reach == 'E7')%>%
-  #select('Reach', 'Point ID', 'Elevation')
+p_df = select(joined_excel_txt_df, UID2, AP, LWR, Elevation)%>%
+  filter(AP =='P')%>% 
+  rename("Permafrost" = "AP")%>% 
+  rename("ElevationP" = "Elevation")
 
-#combined_df = rbind(ts1_elev, ts2_elev)
+final = left_join(a_df, p_df, by=c('UID2','LWR'))%>%
+  mutate(ALT = (ElevationA-ElevationP))
 
-#plot(joined_df$'Point ID', joined_df$Elevation)
 
-# -------
+saveRDS(joined_excel_txt_df, 'outputs/joined_excel_txt_df.rds')
+saveRDS(final, 'outputs/ALT.rds')
+
+
+violin_df=select(final, UID2, LWR, ElevationA, ElevationP, ALT)
+  filter(LWR=="L"|LWR=="R")
+
+
 
