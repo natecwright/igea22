@@ -33,8 +33,8 @@ ts2_reach = read.delim('raw_ts_data/group12.n/ep12_ts2.txt',
   rename("Reach" = "V1") #renames the column
 
 # read in ts1 xyz
-ts1_txt = read.delim("raw_ts_data/group12.n/ep12_ts1.txt",
-                     skip = 1, header = TRUE, nrows= 128, dec = ".", sep = ',')%>%
+ts1_txt = read.delim('raw_ts_data/group12.n/ep12_ts1.txt',
+                     skip = 1, header = TRUE, dec = ".", sep = ',')%>%
   mutate(TS_code = "1")%>% #add total station row
   mutate(Reach = ts1_reach$Reach)%>% #add reach row
   mutate(PointID = as.double(PointID))%>% #changes the column from a character to double type so it can be joined to another double type
@@ -42,8 +42,8 @@ ts1_txt = read.delim("raw_ts_data/group12.n/ep12_ts1.txt",
 
 
 # read in ts2 xyz
-ts2_txt = read.delim("raw_ts_data/group12.n/ep12_ts2.txt",
-                     skip = 1, header = TRUE, nrows= 118, dec = ".", sep = ',')%>%
+ts2_txt = read.delim('raw_ts_data/group12.n/ep12_ts2.txt',
+                     skip = 1, header = TRUE, dec = ".", sep = ',')%>%
   mutate(TS_code = "2")%>% #add ts row
   mutate(Reach = ts2_reach$Reach)%>% #add reach row
   mutate(PointID = as.double(PointID))

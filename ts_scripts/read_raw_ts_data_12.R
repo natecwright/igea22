@@ -95,7 +95,7 @@ ep7 = rbind(joined_df3, joined_df4)%>%
 # separate A's and P's  ----
 
 
-a_df = select(ep7, UID2, Type, LRW, Elevation)%>%
+a_df = select(ep7, UID2, Cross.section, LRW, Type, Number, Elevation)%>%
   filter(Type =='A')%>% 
   rename("Active" = "Type")%>% 
   rename("ElevationA" = "Elevation")
@@ -103,7 +103,7 @@ a_df = select(ep7, UID2, Type, LRW, Elevation)%>%
   # the string to a double
 
 
-p_df = select(ep7, UID2, Type, LRW, Elevation)%>%
+p_df = select(ep7, UID2, Cross.section, LRW, Type, Number, Elevation)%>%
   filter(Type == 'P')%>% 
   rename("Permafrost" = "Type")%>% 
   rename("ElevationP" = "Elevation")
@@ -112,7 +112,7 @@ p_df = select(ep7, UID2, Type, LRW, Elevation)%>%
 
 
 # joins active layer df and permafrost layer df and creates a new column with elevation difference
-final = left_join(a_df, p_df, by=c('UID2','LRW'))%>%
+final = left_join(a_df, p_df, by=c('UID2','LRW', 'Number', 'Cross.section'))%>%
   mutate(ALT = (ElevationA-ElevationP))
 
 saveRDS(ep7, 'outputs/ep7.rds')
@@ -133,6 +133,18 @@ mean2 = mean(water$ALT)
 # ----
 
 
+# ----
+
+new_df = final%>%
+  filter(LRW == 'W')%>%
+  mutate(Temp = paste0(LRW, Number))%>%
+  filter(Temp != 'W2')%>%
+  filter(Temp != 'W4')
+
+temp_df = new_df%>%
+  filter(Cross.section == '3' | Cross.section == '8')
+
+#----
 
 
 
