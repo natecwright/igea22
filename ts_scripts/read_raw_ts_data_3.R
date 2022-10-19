@@ -23,23 +23,23 @@ ts2_excel = read_xlsx('raw_ts_data/fd/fd3_ts2.xlsx')%>%
 #read in metadata
 metadata_excel = read_xlsx('raw_ts_data/fd/fd3_metadata.xlsx')
 #read in reach code
-ts1_reach = read.delim("raw_ts_data/group3/ep7_ts1.txt",
-                       skip = 11, header = FALSE, nrows= 1, dec = ".", sep = '\t')%>%
+ts1_reach = read.delim("raw_ts_data/group3.n/ep7_ts1.txt",
+                       header = FALSE, nrows= 1, dec = ".", sep = '\t')%>%
   transmute(Reach = strsplit(V1, " +")[[1]][3])
 
 
-ts2_reach = read.delim("raw_ts_data/group3/ep7_ts2.txt",
-                        skip = 11, header = FALSE, nrows= 1, dec = ".", sep = '\t')%>%
+ts2_reach = read.delim("raw_ts_data/group3.n/ep7_ts2.txt",
+                         header = FALSE, nrows= 1, dec = ".", sep = '\t')%>%
   transmute(Reach = strsplit(V1, " +")[[1]][3])
 
-ts1_txt = read.delim("raw_ts_data/group3/ep7_ts1.txt",
-                      skip = 17, header = TRUE, nrows= 124, dec = ".", sep = ',')%>%
+ts1_txt = read.delim("raw_ts_data/group3.n/ep7_ts1.txt",
+                      skip = 1, header = TRUE, dec = ".", sep = ',')%>%
   mutate(TS_code = "1")%>%
   mutate(Reach = ts1_reach$Reach)
 
   
-ts2_txt = read.delim("raw_ts_data/group3/ep7_ts2.txt",
-                      skip = 17, header = TRUE, nrows= 111, dec = ".", sep = ',')%>%
+ts2_txt = read.delim("raw_ts_data/group3.n/ep7_ts2.txt",
+                      skip = 1, header = TRUE, dec = ".", sep = ',')%>%
   mutate(TS_code = "2")%>%
   mutate(Reach = ts2_reach$Reach)
 
