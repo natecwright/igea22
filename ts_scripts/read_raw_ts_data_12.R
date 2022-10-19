@@ -12,8 +12,7 @@ setwd('C:/Users/ncw02/Downloads/IGEA/')
 
 ts1_excel = read_xlsx('raw_ts_data/fd/fd12_ts1.xlsx')%>%
   mutate(TS_code  = "1")%>% 
-  rename("Notebook.notes" = "Notes")%>%
-  mutate(Reach = stri_sub_replace(Reach, 'EP', value ='P'))
+  rename("Notebook.notes" = "Notes")
 
 ts2_excel = read_xlsx('raw_ts_data/fd/fd12_ts2.xlsx')%>%
   mutate(TS_code  = "2")%>% 
@@ -68,11 +67,11 @@ ts2_txt = ts2_txt[2:nrow(ts2_txt),]
 
 # this joins excel (digitized data) with metadata for ts1
 joined_df1 = left_join(ts1_excel, metadata_excel, by='Reach')%>%
-  filter(Reach == 'E7')
+  filter(Reach == 'EP7')
 
 # this joins excel (digitized data) with metadata for ts2
 joined_df2 = left_join(ts2_excel, metadata_excel, by='Reach')%>%
-  filter(Reach == 'E7')
+  filter(Reach == 'EP7')
 
 # this joins the previous file with txt file data 
 joined_df3 = left_join(joined_df1, ts1_txt, by=c('Reach','PointID','TS_code'))
@@ -82,9 +81,9 @@ joined_df4 = left_join(joined_df2, ts2_txt, by=c('Reach','PointID','TS_code'))
 # creates a unique ID and another unique ID without A's and P's
 ep7 = rbind(joined_df3, joined_df4)%>%
   mutate(uniqueID = paste0(Reach, PointID, Location, Cross.section, TS_code))%>%
-  mutate(LRW = substr(uniqueID,6,6))%>%
-  mutate(Type = substr(uniqueID,7,7))%>%
-  mutate(Number = substr(uniqueID,8,8))%>%
+  mutate(LRW = substr(uniqueID,7,7))%>%
+  mutate(Type = substr(uniqueID,8,8))%>%
+  mutate(Number = substr(uniqueID,9,9))%>%
   mutate(UID2 = paste0(Reach, LRW, Number, Cross.section, TS_code))%>%
   mutate(Elevation = as.double(str_remove_all(Elevation, ' ')))
 
