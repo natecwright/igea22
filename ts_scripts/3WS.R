@@ -7,19 +7,60 @@ library(tidyr)
 library(stringr)
 
 
-getwd()
 
-#group3
-WS_1 = read.csv('Documents/IGEA/3WS1.csv')
-WS_2 = read.csv('Documents/IGEA/3WS2.csv')
+setwd('/Users/emmaboudreau/Documents/GitHub/igea22/')
 
-
-
+#group3 raw water data
+WS_1 = read_xlsx('Raw_water_data/3WS.1.xlsx')
+WS_2= read_xlsx('Raw_water_data/3WS.2.xlsx')
 
 
+#group 3 df
+WS1_norm_df=WS_1%>%
+  select('Line', 'Analysis', 'Inj Nr', 'd(18_16)Mean', 'd(D_H)Mean', 'Ignore', 'Identifier_1', 'Identifier_2')%>%
+  rename("meanO"="d(18_16)Mean")%>% 
+  filter(Identifier_1 == "Picarro zero 3 6_23_22" | Identifier_1 == "Picarro mid 3 6_23_22" | Identifier_1 == "Picarro depl 3 6_23_22"
+         | Identifier_1 == "Picarro zero 2 6_23_22" | Identifier_1 == "Picarro mid 2 6_23_22" | Identifier_1 == "Picarro depl 2 6_23_22"
+         | Identifier_1 == "Picarro zero 1 6_23_22" | Identifier_1 == "Picarro mid 1 6_23_22"| Identifier_1 == "Picarro depl 1 6_23_22")%>%
+  filter(Ignore == 0)%>%
+  mutate(standardO=case_when(Identifier_1 == "Picarro zero 1 6_23_22" | Identifier_1 == "Picarro zero 2 6_23_22" | Identifier_1 == "Picarro zero 3 6_23_22"~.3,
+                            Identifier_1 == "Picarro mid 3 6_23_22" | Identifier_1 == "Picarro mid 2 6_23_22"| Identifier_1 == "Picarro mid 1 6_23_22"~-20.6,
+                            Identifier_1 == "Picarro depl 3 6_23_22" | Identifier_1 == "Picarro depl 2 6_23_22"| Identifier_1 == "Picarro depl 1 6_23_22"~-29.6,))
+#beta coefficient and intercept for linear regression
+lm( standardO ~ meanO, data = WS1_norm_df)
 
 
 
+
+
+WS2_norm_df=WS_2%>%
+select('Line', 'Analysis', 'Inj Nr', 'd(18_16)Mean', 'd(D_H)Mean', 'Ignore', 'Identifier_1', 'Identifier_2')%>%
+  rename("meanO"="d(18_16)Mean")%>% 
+  filter(Identifier_1 == "Picarro zero 3 6_23_22" | Identifier_1 == "Picarro mid 3 6_23_22" | Identifier_1 == "Picarro depl 3 6_23_22"
+         | Identifier_1 == "Picarro zero 2 6_23_22" | Identifier_1 == "Picarro mid 2 6_23_22" | Identifier_1 == "Picarro depl 2 6_23_22"
+         | Identifier_1 == "Picarro zero 1 6_23_22" | Identifier_1 == "Picarro mid 1 6_23_22"| Identifier_1 == "Picarro depl 1 6_23_22")%>%
+  filter(Ignore == 0)%>%
+  mutate(standardO=case_when(Identifier_1 == "Picarro zero 1 6_23_22" | Identifier_1 == "Picarro zero 2 6_23_22" | Identifier_1 == "Picarro zero 3 6_23_22"~.3,
+                              Identifier_1 == "Picarro mid 3 6_23_22" | Identifier_1 == "Picarro mid 2 6_23_22"| Identifier_1 == "Picarro mid 1 6_23_22"~-20.6,
+                              Identifier_1 == "Picarro depl 3 6_23_22" | Identifier_1 == "Picarro depl 2 6_23_22"| Identifier_1 == "Picarro depl 1 6_23_22"~-29.6,))
+
+#beta coefficient and intercept for linear regression
+lm( standardO ~ meanO, data = WS2_norm_df)
+
+
+WS1_final_df=WS_1%>%
+  select('Line', 'Analysis', 'Inj Nr', 'd(18_16)Mean', 'd(D_H)Mean', 'Ignore', 'Identifier_1', 'Identifier_2')%>%
+  rename("meanO"="d(18_16)Mean")%>% 
+  filter(Ignore == 0)%>%
+  filter(Identifier_2=="sample")%>%
+  mutate(normO=1.0073*meanO-0.2978)
+
+WS2_final_df=WS_2%>%
+  select('Line', 'Analysis', 'Inj Nr', 'd(18_16)Mean', 'd(D_H)Mean', 'Ignore', 'Identifier_1', 'Identifier_2')%>%
+  rename("meanO"="d(18_16)Mean")%>% 
+  filter(Ignore == 0)%>%
+  filter(Identifier_2=="sample")%>%
+  mutate(normO=1.0071*meanO-0.2892)
 
 
 
