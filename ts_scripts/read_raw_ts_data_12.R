@@ -141,8 +141,15 @@ new_df = final%>%
   filter(Temp != 'W2')%>%
   filter(Temp != 'W4')
 
+newnew_df = new_df%>%
+  filter(Cross.section !='3')%>%
+  filter(Cross.section !='8')
+
 temp_df = new_df%>%
-  filter(Cross.section == '3' | Cross.section == '8')
+  filter(Cross.section == '3' | Cross.section == '8')%>%
+  filter(Number != '3')
+
+ultimate_df = rbind(newnew_df, temp_df)
 
 #----
 
