@@ -139,7 +139,8 @@ new_df = final%>%
   filter(LRW == 'W')%>%
   mutate(Temp = paste0(LRW, Number))%>%
   filter(Temp != 'W2')%>%
-  filter(Temp != 'W4')
+  filter(Temp != 'W4')%>%
+  mutate(Xlabel = as.double('0'))
 
 newnew_df = new_df%>%
   filter(Cross.section !='3')%>%
@@ -147,9 +148,20 @@ newnew_df = new_df%>%
 
 temp_df = new_df%>%
   filter(Cross.section == '3' | Cross.section == '8')%>%
-  filter(Number != '3')
+  filter(Number != '3')%>%
+  mutate(Xlabel = '0')
 
-ultimate_df = rbind(newnew_df, temp_df)
+temp2 = final%>%
+  filter(LRW != 'W')%>%
+  mutate(Temp = paste0(LRW, Number))%>%
+  mutate(Xlabel = Number)
+
+temp3 = rbind(newnew_df, temp_df)
+
+ultimate = rbind(temp2, temp3)
+
+saveRDS(ultimate, 'outputs/ALT2.rds')
+
 
 #----
 
