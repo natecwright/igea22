@@ -1,4 +1,4 @@
-# script to read in basic data and look at it
+# script to read in raw data and organize it
 library(dplyr)
 library(readxl)
 library(tidyr)
@@ -79,7 +79,7 @@ joined_df4 = left_join(joined_df2, ts2_txt, by=c('Reach','PointID','TS_code'))
 
 # this joins both ts1 and ts2 data to complete the entire reach
 # creates a unique ID and another unique ID without A's and P's
-ep7 = rbind(joined_df3, joined_df4)%>%
+master = rbind(joined_df3, joined_df4)%>%
   mutate(uniqueID = paste0(Reach, PointID, Location, Cross.section, TS_code))%>%
   mutate(LRW = substr(uniqueID,7,7))%>%
   mutate(Type = substr(uniqueID,8,8))%>%
@@ -112,11 +112,11 @@ p_df = select(ep7, UID2, Cross.section, LRW, Type, Number, Elevation)%>%
 
 
 # joins active layer df and permafrost layer df and creates a new column with elevation difference
-final = left_join(a_df, p_df, by=c('UID2','LRW', 'Number', 'Cross.section'))%>%
+alt_df = left_join(a_df, p_df, by=c('UID2','LRW', 'Number', 'Cross.section'))%>%
   mutate(ALT = (ElevationA-ElevationP))
 
-saveRDS(ep7, 'outputs/ep7.rds')
-saveRDS(final, 'outputs/ALT.rds')
+saveRDS(master, 'outputs/master_ep7.rds')
+saveRDS(alt_df, 'outputs/ALT_ep7.rds')
 
 
 # --------
@@ -139,7 +139,8 @@ new_df = final%>%
   filter(LRW == 'W')%>%
   mutate(Temp = paste0(LRW, Number))%>%
   filter(Temp != 'W2')%>%
-  filter(Temp != 'W4')
+  filter(Temp != 'W4')%>%
+  mutate(Xlabel = as.double('0'))
 
 newnew_df = new_df%>%
   filter(Cross.section !='3')%>%
@@ -147,9 +148,20 @@ newnew_df = new_df%>%
 
 temp_df = new_df%>%
   filter(Cross.section == '3' | Cross.section == '8')%>%
-  filter(Number != '3')
+  filter(Number != '3')%>%
+  mutate(Xlabel = '0')
 
-ultimate_df = rbind(newnew_df, temp_df)
+temp2 = final%>%
+  filter(LRW != 'W')%>%
+  mutate(Temp = paste0(LRW, Number))%>%
+  mutate(Xlabel = Number)
+
+temp3 = rbind(newnew_df, temp_df)
+
+ultimate = rbind(temp2, temp3)
+
+saveRDS(ultimate, 'outputs/ALT2.rds')
+
 
 #----
 
