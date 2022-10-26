@@ -60,6 +60,30 @@ saveRDS(ultimate, 'outputs/ALT2.rds')
 
 # edit the data to only have submerged water points----
 
+step11 = alt_df%>%
+  filter(LRW == 'W')%>%
+  mutate(Temp = paste0(LRW, Number))%>%
+  filter(Temp != 'W1')%>%
+  filter(Temp != 'W5')
+
+x3_water = step11%>%
+  filter(Cross.section =='3')%>%
+  filter(Temp!='W2')%>%
+  filter(Temp!='W4')
+
+x8_water = step11%>%
+  filter(Cross.section =='8')%>%
+  filter(Temp!='W2')%>%
+  filter(Temp!='W4')
+
+most_water = step11%>%
+  filter(Temp!='W3')
+
+final = rbind(most_water, x3_water, x8_water)%>%
+  mutate(Xlabel = 'S')
+
+
+
 
 
 # ----
