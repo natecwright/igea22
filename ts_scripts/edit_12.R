@@ -82,7 +82,8 @@ submerged = rbind(most_water, x3_water, x8_water)%>%
   mutate(Xlabel = 'S')
 
 
-ultimate = rbind(ultimate, submerged)
+ultimate = rbind(ultimate, submerged)%>%
+  filter(UID2 != 'EP7W381')
 
 saveRDS(ultimate, 'outputs/ALT_violin.rds')
 

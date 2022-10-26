@@ -85,7 +85,9 @@ master = rbind(joined_df3, joined_df4)%>%
   mutate(Type = substr(uniqueID,8,8))%>%
   mutate(Number = substr(uniqueID,9,9))%>%
   mutate(UID2 = paste0(Reach, LRW, Number, Cross.section, TS_code))%>%
-  mutate(Elevation = as.double(str_remove_all(Elevation, ' ')))
+  mutate(Elevation = as.double(str_remove_all(Elevation, ' ')))%>%
+  filter(PointID != '147')%>%
+  filter(PointID != '148')
 
 
 
@@ -95,7 +97,7 @@ master = rbind(joined_df3, joined_df4)%>%
 # separate A's and P's  ----
 
 
-a_df = select(ep7, UID2, Cross.section, LRW, Type, Number, Elevation)%>%
+a_df = select(master, UID2, Cross.section, LRW, Type, Number, Elevation)%>%
   filter(Type =='A')%>% 
   rename("Active" = "Type")%>% 
   rename("ElevationA" = "Elevation")
@@ -103,7 +105,7 @@ a_df = select(ep7, UID2, Cross.section, LRW, Type, Number, Elevation)%>%
   # the string to a double
 
 
-p_df = select(ep7, UID2, Cross.section, LRW, Type, Number, Elevation)%>%
+p_df = select(master, UID2, Cross.section, LRW, Type, Number, Elevation)%>%
   filter(Type == 'P')%>% 
   rename("Permafrost" = "Type")%>% 
   rename("ElevationP" = "Elevation")
@@ -120,55 +122,3 @@ saveRDS(alt_df, 'outputs/ALT_ep7.rds')
 
 
 # --------
-
-
-# do some calcs ----
-mean = mean(final$ALT)
-water = final%>%
-  filter(LRW =='W')
-
-mean2 = mean(water$ALT)
-
-
-# ----
-
-
-# ----
-
-new_df = final%>%
-  filter(LRW == 'W')%>%
-  mutate(Temp = paste0(LRW, Number))%>%
-  filter(Temp != 'W2')%>%
-  filter(Temp != 'W4')%>%
-  mutate(Xlabel = as.double('0'))
-
-newnew_df = new_df%>%
-  filter(Cross.section !='3')%>%
-  filter(Cross.section !='8')
-
-temp_df = new_df%>%
-  filter(Cross.section == '3' | Cross.section == '8')%>%
-  filter(Number != '3')%>%
-  mutate(Xlabel = '0')
-
-temp2 = final%>%
-  filter(LRW != 'W')%>%
-  mutate(Temp = paste0(LRW, Number))%>%
-  mutate(Xlabel = Number)
-
-temp3 = rbind(newnew_df, temp_df)
-
-ultimate = rbind(temp2, temp3)
-
-saveRDS(ultimate, 'outputs/ALT2.rds')
-
-
-#----
-
-
-
-
-
-
-
-
