@@ -52,7 +52,6 @@ step5 = rbind(step2, step3)
 
 ultimate = rbind(step4, step5)
 
-saveRDS(ultimate, 'outputs/ALT2.rds')
 
 
 # ----
@@ -79,10 +78,13 @@ x8_water = step11%>%
 most_water = step11%>%
   filter(Temp!='W3')
 
-final = rbind(most_water, x3_water, x8_water)%>%
+submerged = rbind(most_water, x3_water, x8_water)%>%
   mutate(Xlabel = 'S')
 
 
+ultimate = rbind(ultimate, submerged)
+
+saveRDS(ultimate, 'outputs/ALT_violin.rds')
 
 
 
