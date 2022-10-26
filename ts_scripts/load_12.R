@@ -7,6 +7,12 @@ library(stringi)
 
 setwd('C:/Users/ncw02/Downloads/IGEA/')
 
+g12_files = list.files('raw_ts_data/group12.n')
+
+read_function = function(input_file){
+
+  station_ID = toupper(strsplit(input_file, "_")[[1]][1])
+  
 # read in data ----------
 # setwd (path to the data)
 
@@ -18,26 +24,24 @@ ts2_excel = read_xlsx('raw_ts_data/fd/fd12_ts2.xlsx')%>%
   mutate(TS_code  = "2")%>% 
   rename("Notebook.notes" = "Notes")
 
-# rename column names
-names(ts1_excel) = make.names(names(ts1_excel), unique=TRUE)
-names(ts2_excel) = make.names(names(ts2_excel), unique=TRUE)
-
+names(ts1_excel) = make.names(names(ts1_excel), unique = TRUE)
+names(ts2_excel) = make.names(names(ts2_excel), unique = TRUE)
 
 metadata_excel = read_xlsx('raw_ts_data/fd/fd12_metadata.xlsx')%>%
   rename("Sample.elevation" = "Elevation")
 
 # extract reach from txt file for ts1 (should be identical for ts2)
-ts1_reach = read.delim('raw_ts_data/group12.n/ep7_ts1.txt',
+ts1_reach = read.delim(paste0('raw_ts_data/group12.n/',station_ID,'_ts1.txt'),
                        header = FALSE, nrows= 1, dec = ".", sep = '\t')%>%
   transmute(Reach = V1)
 
 # extract reach from txt file for ts2 (should be identical for ts1)
-ts2_reach = read.delim('raw_ts_data/group12.n/ep7_ts2.txt',
+ts2_reach = read.delim(paste0('raw_ts_data/group12.n/',station_ID,'_ts2.txt'),
                         header = FALSE, nrows= 1, dec = ".", sep = '\t')%>%
   transmute(Reach = V1)
 
 # read in ts1 xyz
-ts1_txt = read.delim("raw_ts_data/group12.n/ep7_ts1.txt",
+ts1_txt = read.delim(paste0('raw_ts_data/group12.n/',station_ID,'_ts1.txt'),
                       skip = 1, header = TRUE, dec = ".", sep = ',')%>%
   mutate(TS_code = "1")%>%
   mutate(Reach = ts1_reach$Reach)%>%
@@ -48,7 +52,7 @@ ts1_txt = ts1_txt[2:nrow(ts1_txt),]
 
 
 # read in ts2 xyz
-ts2_txt = read.delim("raw_ts_data/group12.n/ep7_ts2.txt",
+ts2_txt = read.delim(paste0('raw_ts_data/group12.n/',station_ID,'_ts2.txt'),
                       skip = 1, header = TRUE, dec = ".", sep = ',')%>%
   mutate(TS_code = "2")%>%
   mutate(Reach = ts2_reach$Reach)%>%
@@ -67,11 +71,11 @@ ts2_txt = ts2_txt[2:nrow(ts2_txt),]
 
 # this joins excel (digitized data) with metadata for ts1
 joined_df1 = left_join(ts1_excel, metadata_excel, by='Reach')%>%
-  filter(Reach == 'EP7')
+  filter(Reach == station_ID)
 
 # this joins excel (digitized data) with metadata for ts2
 joined_df2 = left_join(ts2_excel, metadata_excel, by='Reach')%>%
-  filter(Reach == 'EP7')
+  filter(Reach == station_ID)
 
 # this joins the previous file with txt file data 
 joined_df3 = left_join(joined_df1, ts1_txt, by=c('Reach','PointID','TS_code'))
@@ -79,7 +83,7 @@ joined_df4 = left_join(joined_df2, ts2_txt, by=c('Reach','PointID','TS_code'))
 
 # this joins both ts1 and ts2 data to complete the entire reach
 # creates a unique ID and another unique ID without A's and P's
-master = rbind(joined_df3, joined_df4)%>%
+master_df = rbind(joined_df3, joined_df4)%>%
   mutate(uniqueID = paste0(Reach, PointID, Location, Cross.section, TS_code))%>%
   mutate(LRW = substr(uniqueID,7,7))%>%
   mutate(Type = substr(uniqueID,8,8))%>%
@@ -97,7 +101,7 @@ master = rbind(joined_df3, joined_df4)%>%
 # separate A's and P's  ----
 
 
-a_df = select(master, UID2, Cross.section, LRW, Type, Number, Elevation)%>%
+a_df = select(master_df, UID2, Cross.section, LRW, Type, Number, Elevation)%>%
   filter(Type =='A')%>% 
   rename("Active" = "Type")%>% 
   rename("ElevationA" = "Elevation")
@@ -105,20 +109,24 @@ a_df = select(master, UID2, Cross.section, LRW, Type, Number, Elevation)%>%
   # the string to a double
 
 
-p_df = select(master, UID2, Cross.section, LRW, Type, Number, Elevation)%>%
+p_df = select(master_df, UID2, Cross.section, LRW, Type, Number, Elevation)%>%
   filter(Type == 'P')%>% 
   rename("Permafrost" = "Type")%>% 
   rename("ElevationP" = "Elevation")
   #mutate(ElevationP = as.double(str_remove_all(ElevationP, ' '))) #removes weird spaces from text file and converts
-# the string to a double
+  #the string to a double
 
 
 # joins active layer df and permafrost layer df and creates a new column with elevation difference
 alt_df = left_join(a_df, p_df, by=c('UID2','LRW', 'Number', 'Cross.section'))%>%
   mutate(ALT = (ElevationA-ElevationP))
 
-saveRDS(master, 'outputs/master_ep7.rds')
-saveRDS(alt_df, 'outputs/ALT_ep7.rds')
+saveRDS(master_df, paste0('outputs/munged/master_df_',station_ID,'.rds'))
+saveRDS(alt_df, paste0('outputs/munged/ALT_',station_ID,'.rds'))
 
+}
+
+lapply(g12_files,read_function)
 
 # --------
+
