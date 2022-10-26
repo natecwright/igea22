@@ -8,15 +8,15 @@ library(ggplot2)
 setwd('/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22')
 
 #read in file
-ep7_elev=readRDS('outputs/ALT.rds')%>%
-  filter(LRW=="L"|LRW=="R")#%>%
+ep7_ALT=readRDS('outputs/ALT2.rds')#%>%
+  #filter(LRW=="L"|LRW=="R")#%>%
   #filter(Number==1)
   
 
-p3=ggplot(ep7_elev)+
-  geom_violin(aes(y=ALT, x=Number, colour=as.factor(Number)))+ #as.factor makes discreet colors for the points
+p3=ggplot(ep7_ALT)+
+  geom_violin(aes(y=ALT, x=Xlabel, colour=as.factor(Xlabel)))+ #as.factor makes discreet colors for the points
   #geom_Violin(aes(y=ALT, x=cross.section, colour=as.factor(Cross.section)))+
-  stat_summary(aes(y=ALT, x=Number,colour=as.factor(Number)),
+  stat_summary(aes(y=ALT, x=Xlabel,colour=as.factor(Xlabel)),
                  fun = "mean",
                geom = "crossbar",
                width = 0.5)+
@@ -26,7 +26,7 @@ p3=ggplot(ep7_elev)+
   labs(colour = 'LRW')+ #title of the legend
   theme(legend.text=element_text(size=14),
         legend.title=element_text(size=14),
-        legend.position ='left',
+        legend.position ='none',
         axis.text= element_text(size=14),
         axis.title= element_text(size=14),
         plot.title = element_text(color="black", size=14, face="bold.italic"),
