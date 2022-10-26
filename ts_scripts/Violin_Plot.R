@@ -1,5 +1,5 @@
 #Create a plot----
-
+early_violin=function(file){
 library(dplyr)
 library(readxl)
 library(ggplot2)
@@ -8,12 +8,12 @@ library(ggplot2)
 setwd('/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22')
 
 #read in file
-ep7_ALT=readRDS('outputs/ALT2.rds')#%>%
+violin_ALT=readRDS(file)#%>%
   #filter(LRW=="L"|LRW=="R")#%>%
   #filter(Number==1)
   
 
-p3=ggplot(ep7_ALT)+
+p3=ggplot(violin_ALT)+
   geom_violin(aes(y=ALT, x=Xlabel, colour=as.factor(Xlabel)))+ #as.factor makes discreet colors for the points
   #geom_Violin(aes(y=ALT, x=cross.section, colour=as.factor(Cross.section)))+
   stat_summary(aes(y=ALT, x=Xlabel,colour=as.factor(Xlabel)),
@@ -33,6 +33,15 @@ p3=ggplot(ep7_ALT)+
         legend.background = element_rect(fill=alpha('white',0.8)))
 
 
-plot(p3)
+plot(p3)}
+
+
+#batch
+#reads and plots all of the files in this folder
+file_list=list.files('/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22/outputs')
+
+lapply(file_list, early_violin)
+
+
 
 #--------------------
