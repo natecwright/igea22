@@ -1,4 +1,5 @@
-#Create a plot----
+#Create and batch violin plot----
+
 early_violin=function(file){
 library(dplyr)
 library(readxl)
@@ -41,7 +42,6 @@ plot(p3)}
 file_list=list.files('/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22/outputs')
 
 lapply(file_list, early_violin)
-
 
 
 #--------------------

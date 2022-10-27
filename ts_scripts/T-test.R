@@ -11,7 +11,7 @@ setwd('/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge
 
 #read in file
 group1=readRDS('outputs/ALT_violin.rds')%>%
-  Filter(Number=1)
+  Filter(Xlabel=1)
 
 t.test(group1, group2, var.equal=TRUE)
 
