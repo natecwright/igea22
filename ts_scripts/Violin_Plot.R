@@ -40,6 +40,8 @@ plot(p3)}
 #batch
 #reads and plots all of the files in this folder
 file_list=list.files('/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22/outputs')
+Giant_df=do.call(rbind(list.files(munged)))
+early_violin(Giant_df)
 
 lapply(file_list, early_violin)
 
