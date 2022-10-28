@@ -8,10 +8,11 @@ library(stringi)
 setwd('C:/Users/ncw02/Downloads/IGEA/')
 
 g12_files = list.files('raw_ts_data/group12.n')
+#input_file = "tp5_ts1.txt"
 
 read_function = function(input_file){
 
-  station_ID = toupper(strsplit(input_file, "_")[[1]][1])
+reach_ID = toupper(strsplit(input_file, "_")[[1]][1])
   
 # read in data ----------
 # setwd (path to the data)
@@ -31,17 +32,17 @@ metadata_excel = read_xlsx('raw_ts_data/fd/fd12_metadata.xlsx')%>%
   rename("Sample.elevation" = "Elevation")
 
 # extract reach from txt file for ts1 (should be identical for ts2)
-ts1_reach = read.delim(paste0('raw_ts_data/group12.n/',station_ID,'_ts1.txt'),
+ts1_reach = read.delim(paste0('raw_ts_data/group12.n/',reach_ID,'_ts1.txt'),
                        header = FALSE, nrows= 1, dec = ".", sep = '\t')%>%
   transmute(Reach = V1)
 
 # extract reach from txt file for ts2 (should be identical for ts1)
-ts2_reach = read.delim(paste0('raw_ts_data/group12.n/',station_ID,'_ts2.txt'),
+ts2_reach = read.delim(paste0('raw_ts_data/group12.n/',reach_ID,'_ts2.txt'),
                         header = FALSE, nrows= 1, dec = ".", sep = '\t')%>%
   transmute(Reach = V1)
 
 # read in ts1 xyz
-ts1_txt = read.delim(paste0('raw_ts_data/group12.n/',station_ID,'_ts1.txt'),
+ts1_txt = read.delim(paste0('raw_ts_data/group12.n/',reach_ID,'_ts1.txt'),
                       skip = 1, header = TRUE, dec = ".", sep = ',')%>%
   mutate(TS_code = "1")%>%
   mutate(Reach = ts1_reach$Reach)%>%
@@ -50,14 +51,12 @@ ts1_txt = read.delim(paste0('raw_ts_data/group12.n/',station_ID,'_ts1.txt'),
 # manual intervention to get rid of PT 101 which was being problematic
 ts1_txt = ts1_txt[2:nrow(ts1_txt),]
 
-
 # read in ts2 xyz
-ts2_txt = read.delim(paste0('raw_ts_data/group12.n/',station_ID,'_ts2.txt'),
+ts2_txt = read.delim(paste0('raw_ts_data/group12.n/',reach_ID,'_ts2.txt'),
                       skip = 1, header = TRUE, dec = ".", sep = ',')%>%
   mutate(TS_code = "2")%>%
   mutate(Reach = ts2_reach$Reach)%>%
   mutate(PointID = as.double(PointID))
-
 
 # manual intervention to get rid of PT 101 which was being problematic
 ts2_txt = ts2_txt[2:nrow(ts2_txt),]
@@ -71,11 +70,11 @@ ts2_txt = ts2_txt[2:nrow(ts2_txt),]
 
 # this joins excel (digitized data) with metadata for ts1
 joined_df1 = left_join(ts1_excel, metadata_excel, by='Reach')%>%
-  filter(Reach == station_ID)
+  filter(Reach == reach_ID)
 
 # this joins excel (digitized data) with metadata for ts2
 joined_df2 = left_join(ts2_excel, metadata_excel, by='Reach')%>%
-  filter(Reach == station_ID)
+  filter(Reach == reach_ID)
 
 # this joins the previous file with txt file data 
 joined_df3 = left_join(joined_df1, ts1_txt, by=c('Reach','PointID','TS_code'))
@@ -89,17 +88,14 @@ master_df = rbind(joined_df3, joined_df4)%>%
   mutate(Type = substr(uniqueID,8,8))%>%
   mutate(Number = substr(uniqueID,9,9))%>%
   mutate(UID2 = paste0(Reach, LRW, Number, Cross.section, TS_code))%>%
-  mutate(Elevation = as.double(str_remove_all(Elevation, ' ')))%>%
-  filter(PointID != '147')%>%
-  filter(PointID != '148')
-
-
+  mutate(Elevation = as.double(str_remove_all(Elevation, ' ')))#%>%
+  #filter(PointID != '147')%>%
+  #filter(PointID != '148')
 
 # -------
 
 
 # separate A's and P's  ----
-
 
 a_df = select(master_df, UID2, Cross.section, LRW, Type, Number, Elevation)%>%
   filter(Type =='A')%>% 
@@ -108,7 +104,6 @@ a_df = select(master_df, UID2, Cross.section, LRW, Type, Number, Elevation)%>%
   #mutate(ElevationA = as.double(str_remove_all(ElevationA, ' '))) #removes weird spaces from text file and converts
   # the string to a double
 
-
 p_df = select(master_df, UID2, Cross.section, LRW, Type, Number, Elevation)%>%
   filter(Type == 'P')%>% 
   rename("Permafrost" = "Type")%>% 
@@ -116,13 +111,12 @@ p_df = select(master_df, UID2, Cross.section, LRW, Type, Number, Elevation)%>%
   #mutate(ElevationP = as.double(str_remove_all(ElevationP, ' '))) #removes weird spaces from text file and converts
   #the string to a double
 
-
 # joins active layer df and permafrost layer df and creates a new column with elevation difference
 alt_df = left_join(a_df, p_df, by=c('UID2','LRW', 'Number', 'Cross.section'))%>%
   mutate(ALT = (ElevationA-ElevationP))
 
-saveRDS(master_df, paste0('outputs/munged/master_df_',station_ID,'.rds'))
-saveRDS(alt_df, paste0('outputs/munged/ALT_',station_ID,'.rds'))
+saveRDS(master_df, paste0('outputs/munged/master_df_',reach_ID,'.rds'))
+saveRDS(alt_df, paste0('outputs/munged/ALT_',reach_ID,'.rds'))
 
 }
 
