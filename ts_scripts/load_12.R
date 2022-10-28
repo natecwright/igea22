@@ -8,7 +8,7 @@ library(stringi)
 setwd('C:/Users/ncw02/Downloads/IGEA/')
 
 g12_files = list.files('raw_ts_data/group12.n')
-#input_file = "ep7_ts1.txt"
+#input_file = "tp5_ts1.txt"
 
 read_function = function(input_file){
 
@@ -88,9 +88,9 @@ master_df = rbind(joined_df3, joined_df4)%>%
   mutate(Type = substr(uniqueID,8,8))%>%
   mutate(Number = substr(uniqueID,9,9))%>%
   mutate(UID2 = paste0(Reach, LRW, Number, Cross.section, TS_code))%>%
-  mutate(Elevation = as.double(str_remove_all(Elevation, ' ')))%>%
-  filter(PointID != '147')%>%
-  filter(PointID != '148')
+  mutate(Elevation = as.double(str_remove_all(Elevation, ' ')))#%>%
+  #filter(PointID != '147')%>%
+  #filter(PointID != '148')
 
 # -------
 

@@ -1,22 +1,4 @@
-IDEX
-
-HEADER
-        VERSION 1.20
-        SYSTEM  "TS02power-7\""
-        UNITS
-                ANGULAR DMS
-                LINEAR  METRE
-                TEMP    CELSIUS
-                PRESS   HPA
-                TIME    DMY
-        END UNITS
-        PROJECT
-                NAME    "TP05"
-                OPERATOR        "JS"
-                CREATION_DATE   12-04-2022/09:33:02.0
-        END PROJECT
-END HEADER
-DATABASE
+TP5
         POINTS (PointNo, PointID, East, North, Elevation, Code, Date, CLASS)
                 8388613,        "101",  ,       ,       789.206638,     "",    1                                                                                        2-04-2022/09:40:47.0    ,       MEAS;
                 8388616,        "1",    412783.876671,  7620390.912412, 788.9079                                                                                        93,     "",     12-04-2022/10:03:17.0   ,       MEAS;
