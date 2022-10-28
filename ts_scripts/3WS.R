@@ -72,7 +72,10 @@ WS2_final_df=WS_2%>%
   rename("meanO"="d(18_16)Mean")%>% 
   filter(Ignore == 0)%>%
   filter(Identifier_2=="sample")%>%
-  mutate(normO=slope2*meanO-intercept2)
+  mutate(normO=slope2*meanO-intercept2)%>%
+  group_by(Identifier_1)%>%
+  summarize(normOmean = mean(normO))
+
 
 
 
