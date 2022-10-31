@@ -40,7 +40,13 @@ WS1_final_df=WS_1%>%
   mutate(normO=1.0125*meanO-0.1211)
 
 
+#precip group 1 5/30-6/5
 
+fprecip=(dground-dstream)/(dground-dprecip)
+
+
+
+#precip group 2 6/8-6/16
 
 
 
