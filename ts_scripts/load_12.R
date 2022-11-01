@@ -7,10 +7,10 @@ library(stringi)
 
 setwd('C:/Users/ncw02/Downloads/IGEA/')
 
-g12_files = list.files('raw_ts_data/group12.n')
-#input_file = "tp5_ts1.txt"
+#g12_files = list.files('raw_ts_data/group12.n')
+input_file = "tp13_ts1.txt"
 
-read_function = function(input_file){
+#read_function = function(input_file){
 
 reach_ID = toupper(strsplit(input_file, "_")[[1]][1])
   
@@ -115,12 +115,12 @@ p_df = select(master_df, UID2, Cross.section, LRW, Type, Number, Elevation)%>%
 alt_df = left_join(a_df, p_df, by=c('UID2','LRW', 'Number', 'Cross.section'))%>%
   mutate(ALT = (ElevationA-ElevationP))
 
-saveRDS(master_df, paste0('outputs/munged/master_df_',reach_ID,'.rds'))
-saveRDS(alt_df, paste0('outputs/munged/ALT_',reach_ID,'.rds'))
+saveRDS(master_df, paste0('outputs/munged_12/master_',reach_ID,'.rds'))
+saveRDS(alt_df, paste0('outputs/munged_12/ALT_',reach_ID,'.rds'))
 
-}
+#}
 
-lapply(g12_files,read_function)
+#lapply(g12_files,read_function)
 
 # --------
 
