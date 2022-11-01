@@ -118,8 +118,6 @@ p_df = select(master_df, UID2, AP, LWR, Elevation)%>%
 alt_df = left_join(a_df, p_df, by=c('UID2','LWR'))%>%
   mutate(ALT = (ElevationA-ElevationP))
 
-alt_df = left_join(a_df, p_df, by=c('UID2','LWR'))%>%
-  mutate(ALT = (ElevationA-ElevationP))
 
 
 #saving master_df and alt_df as rds and adding 3 in front of reach_ID to distinguish group 3 from 1 and 2
