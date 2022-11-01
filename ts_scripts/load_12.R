@@ -8,7 +8,7 @@ library(stringi)
 setwd('C:/Users/ncw02/Downloads/IGEA/')
 
 g12_files = list.files('raw_ts_data/group12.n')
-#input_file = "tp13_ts1.txt"
+#input_file = "tp06_ts1.txt"
 
 read_function = function(input_file){
 
