@@ -7,10 +7,10 @@ library(stringi)
 
 setwd('C:/Users/ncw02/Downloads/IGEA/')
 
-#g12_files = list.files('raw_ts_data/group12.n')
-input_file = "tp13_ts1.txt"
+g12_files = list.files('raw_ts_data/group12.n')
+#input_file = "tp13_ts1.txt"
 
-#read_function = function(input_file){
+read_function = function(input_file){
 
 reach_ID = toupper(strsplit(input_file, "_")[[1]][1])
   
@@ -84,9 +84,9 @@ joined_df4 = left_join(joined_df2, ts2_txt, by=c('Reach','PointID','TS_code'))
 # creates a unique ID and another unique ID without A's and P's
 master_df = rbind(joined_df3, joined_df4)%>%
   mutate(uniqueID = paste0(Reach, PointID, Location, Cross.section, TS_code))%>%
-  mutate(LRW = substr(uniqueID,7,7))%>%
-  mutate(Type = substr(uniqueID,8,8))%>%
-  mutate(Number = substr(uniqueID,9,9))%>%
+  mutate(LRW = substr(uniqueID,8,8))%>%
+  mutate(Type = substr(uniqueID,9,9))%>%
+  mutate(Number = substr(uniqueID,10,10))%>%
   mutate(UID2 = paste0(Reach, LRW, Number, Cross.section, TS_code))%>%
   mutate(Elevation = as.double(str_remove_all(Elevation, ' ')))#%>%
   #filter(PointID != '147')%>%
@@ -118,9 +118,9 @@ alt_df = left_join(a_df, p_df, by=c('UID2','LRW', 'Number', 'Cross.section'))%>%
 saveRDS(master_df, paste0('outputs/munged_12/master_',reach_ID,'.rds'))
 saveRDS(alt_df, paste0('outputs/munged_12/ALT_',reach_ID,'.rds'))
 
-#}
+}
 
-#lapply(g12_files,read_function)
+lapply(g12_files,read_function)
 
 # --------
 
