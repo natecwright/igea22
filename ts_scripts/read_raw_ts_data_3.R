@@ -85,9 +85,9 @@ joined_df2 = rbind(ts1_txt,ts2_txt)
 master_df = left_join(joined_df1, joined_df2, by=c('Reach', 'TS_code', 'PointID'))%>%
 
   mutate(uniqueID = paste(Reach,TS_code,Location,XSection))%>%
-  mutate(AP = substr(uniqueID,9,9))%>%
-  mutate(LWR = substr(uniqueID,8,8))%>%
-  mutate(number = substr(uniqueID,10,10))%>%
+  mutate(AP = substr(uniqueID,10,10))%>%
+  mutate(LWR = substr(uniqueID,9,9))%>%
+  mutate(number = substr(uniqueID,11,11))%>%
   mutate(UID2 = paste0(Reach,TS_code,LWR,number,XSection))%>%
   mutate(Elevation = as.double(str_remove_all(Elevation, ' ')))%>%
   filter(!PointID==101)
@@ -121,8 +121,8 @@ alt_df = left_join(a_df, p_df, by=c('UID2','LWR'))%>%
 
 
 #saving master_df and alt_df as rds and adding 3 in front of reach_ID to distinguish group 3 from 1 and 2
-saveRDS(master_df, paste0('outputs/munged/master_df_3',reach_ID,'.rds'))
-saveRDS(alt_df, paste0('outputs/ALT_3',reach_ID,'.rds'))
+saveRDS(master_df, paste0('outputs/munged_3/master_3',reach_ID,'.rds'))
+saveRDS(alt_df, paste0('outputs/munged_3/ALT_3',reach_ID,'.rds'))
 
 
 
@@ -131,4 +131,5 @@ saveRDS(alt_df, paste0('outputs/ALT_3',reach_ID,'.rds'))
 #lapply takes thing to be looped over in first position and the function in second position
 lapply(g3_files,read_function)
 read_function(g3_files[1])
+
 
