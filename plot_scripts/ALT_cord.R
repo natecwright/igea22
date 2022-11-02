@@ -5,15 +5,23 @@ library(readxl)
 library(ggplot2)
 
 #setwd(path to data) 
-setwd('/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22')
+setwd('/Users/emmaboudreau/Documents/GitHub/igea22/')
 
 #read in file
-ep7_elev=readRDS('outputs/ALT.rds')#%>%
-filter(UID2==E7W)
+g3_elev=readRDS('outputs/ALT_3tp17.rds')
+xs3=substr(g3_elev$UID2,8,8)
+
+g1_elev=readRDS('outputs/ALT_tp17.rds')
+xs1=substr(g1_elev$UID2,8,8)
+
+
+g3_coord=readRDS('outputs/master_tp17.rds')
+
+
 
 p2=ggplot(ep7_elev)+
-  geom_point(aes(y=ElevationA, x=UID2, colour="blue"))+ #as.factor makes discreet colors for the points
-  geom_point(aes(y=ElevationP, x=UID2, colour="red"))+
+  geom_point(aes(y=ALT, x=UID2, colour="blue"))+ #as.factor makes discreet colors for the points
+  geom_point(aes(y=ALT, x=UID2, colour="red"))+
   theme_bw()+ #gets rid of grey background
   xlab('UID2')+
   ylab('Active Layer Elevation(m)')+
