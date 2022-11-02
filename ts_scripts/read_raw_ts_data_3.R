@@ -9,9 +9,10 @@ library(stringr)
 setwd('/Users/emmaboudreau/Documents/GitHub/igea22/')
 
 
-g3_files=list.files('raw_ts_data/group3.n')
+#g3_files=list.files('raw_ts_data/group3.n')
+input_file="ep07_ts1.txt"
 
-read_function = function(input_file) {
+#read_function = function(input_file) {
   
   reach_ID = strsplit(input_file, "_")[[1]][1]
 
@@ -23,8 +24,10 @@ read_function = function(input_file) {
 ts1_excel = read_xlsx('raw_ts_data/fd/fd3_ts1.xlsx')%>%
   mutate(TS_code  = "1")
 
+
 ts2_excel = read_xlsx('raw_ts_data/fd/fd3_ts2.xlsx')%>%
   mutate(TS_code  = "2")
+  
   
 
 
@@ -50,21 +53,23 @@ ts2_reach = read.delim(paste0('raw_ts_data/group3.n/',reach_ID,'_ts2.txt'),
 ts1_txt = read.delim(paste0('raw_ts_data/group3.n/',reach_ID,'_ts1.txt'),
                       skip = 1, header = TRUE, dec = ".", sep = ',')%>%
   mutate(TS_code = "1")%>%
-  mutate(Reach = ts1_reach$Reach)%>%
-  mutate(PointID=as.double(PointID))
-
+  mutate(Reach=ts1$Reach))
+  # mutate(Reach = gsub('3','', ts1_reach$Reach))%>%
+  mutate(PointID=as.double(PointID))%>%
+filter(!is.na(PointID))
 # manual intervention to get rid of PT 101 which was being problematic
-ts1_txt = ts1_txt[2:nrow(ts1_txt),]
+
 
   
 ts2_txt = read.delim(paste0('raw_ts_data/group3.n/',reach_ID,'_ts2.txt'),
                       skip = 1, header = TRUE, dec = ".", sep = ',')%>%
   mutate(TS_code = "2")%>%
-  mutate(Reach = ts2_reach$Reach)%>%
-  mutate(PointID=as.double(PointID))
+  mutate(Reach = gsub('3','', ts2_reach$Reach))%>% #trying to remove 3 from reach to match reach_ID
+  mutate(PointID=as.double(PointID))%>%
+  filter(!is.na(PointID))
 
 
-ts2_txt = ts2_txt[2:nrow(ts2_txt),]
+
 
 #----Join data frames
 
@@ -72,7 +77,9 @@ ts2_txt = ts2_txt[2:nrow(ts2_txt),]
 
 
 #row bind excel files for ts1 and ts2
-joined_df1 = rbind(ts1_excel,ts2_excel)
+joined_df1 = rbind(ts1_excel,ts2_excel)%>%
+  
+  filter(Reach==toupper(reach_ID))
 
 #row bind txt files for ts1 and ts2
 joined_df2 = rbind(ts1_txt,ts2_txt)
@@ -127,9 +134,9 @@ saveRDS(alt_df, paste0('outputs/munged_3/ALT_3',reach_ID,'.rds'))
 
 
 
-}
+#}
 #lapply takes thing to be looped over in first position and the function in second position
-lapply(g3_files,read_function)
-read_function(g3_files[1])
+# lapply(g3_files,read_function)
+# read_function(g3_files[1])
 
 

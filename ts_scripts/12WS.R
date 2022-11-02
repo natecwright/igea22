@@ -32,6 +32,8 @@ lm( standardO ~ meanO, data = WS1_norm_df)
 
 
 
+
+
 WS1_final_df=WS_1%>%
   select('Line', 'Analysis', 'Inj Nr', 'd(18_16)Mean', 'd(D_H)Mean', 'Ignore', 'Identifier_1', 'Identifier_2')%>%
   rename("meanO"="d(18_16)Mean")%>% 
@@ -49,5 +51,14 @@ fprecip=(dground-dstream)/(dground-dprecip)
 #precip group 2 6/8-6/16
 
 
+# 
+# need to:
+#   find the average or mean for normO each sample (4,5,6=INJ Nrb)
+# find closest date to our sample in NEON data
+# decide or try to NEON data closest to sample date over all data given or the closetst year (2021)
+# 
+# G1:5/30-6/5
+# G2: 6/8-6/16
+# G3: 8/17-8/26
 
 
