@@ -19,8 +19,8 @@ reach_ID = toupper(strsplit(input_file, "_")[[1]][1])
 
 ts1_excel = read_xlsx('raw_ts_data/fd/fd12_ts1.xlsx')%>%
   mutate(TS_code  = "1")%>% 
-  rename("Notebook.notes" = "Notes")#%>%
-  #filter(ERRORCODE == 'NA')
+  rename("Notebook.notes" = "Notes")%>%
+  filter(is.na(ERRORCODE))
 
 ts2_excel = read_xlsx('raw_ts_data/fd/fd12_ts2.xlsx')%>%
   mutate(TS_code  = "2")%>% 
