@@ -62,3 +62,12 @@ fprecip=(dground-dstream)/(dground-dprecip)
 # G3: 8/17-8/26
 
 
+
+
+# 
+# hydrogen standards
+# picarro zero d2h=1.8+/-.9
+# picarro mid d2h=-159+/-1.3
+# picarro depl dwh=-235+/-1.8
+
+
