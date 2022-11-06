@@ -76,14 +76,8 @@ WS2_final_df=WS_2%>%
   group_by(Identifier_1)%>%
   summarize(normOmean = mean(normO))
 
+# G3: 8/17-8/26
 
-
-
-
-
-
-
-# 
 # hydrogen standards
 # picarro zero d2h=1.8+/-.9
 # picarro mid d2h=-159+/-1.3
