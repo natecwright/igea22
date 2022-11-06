@@ -83,10 +83,11 @@ WS2_final_df=WS_2%>%
 
 
 
-
-
-
-
+# 
+# hydrogen standards
+# picarro zero d2h=1.8+/-.9
+# picarro mid d2h=-159+/-1.3
+# picarro depl dwh=-235+/-1.8
 
 
 

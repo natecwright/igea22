@@ -9,10 +9,10 @@ library(stringr)
 setwd('/Users/emmaboudreau/Documents/GitHub/igea22/')
 
 
-#g3_files=list.files('raw_ts_data/group3.n')
-input_file="ep07_ts1.txt"
+g3_files=list.files('raw_ts_data/group3.n')
+#input_file="3ep07_ts1.txt"
 
-#read_function = function(input_file) {
+read_function = function(input_file) {
   
   reach_ID = strsplit(input_file, "_")[[1]][1]
 
@@ -53,10 +53,10 @@ ts2_reach = read.delim(paste0('raw_ts_data/group3.n/',reach_ID,'_ts2.txt'),
 ts1_txt = read.delim(paste0('raw_ts_data/group3.n/',reach_ID,'_ts1.txt'),
                       skip = 1, header = TRUE, dec = ".", sep = ',')%>%
   mutate(TS_code = "1")%>%
-  mutate(Reach=ts1$Reach))
+  mutate(Reach=ts1_reach$Reach)%>%
   # mutate(Reach = gsub('3','', ts1_reach$Reach))%>%
   mutate(PointID=as.double(PointID))%>%
-filter(!is.na(PointID))
+  filter(!is.na(PointID))
 # manual intervention to get rid of PT 101 which was being problematic
 
 
@@ -64,7 +64,8 @@ filter(!is.na(PointID))
 ts2_txt = read.delim(paste0('raw_ts_data/group3.n/',reach_ID,'_ts2.txt'),
                       skip = 1, header = TRUE, dec = ".", sep = ',')%>%
   mutate(TS_code = "2")%>%
-  mutate(Reach = gsub('3','', ts2_reach$Reach))%>% #trying to remove 3 from reach to match reach_ID
+  mutate(Reach=ts2_reach$Reach)%>%
+  # mutate(Reach = gsub('3','', ts2_reach$Reach))%>% #trying to remove 3 from reach to match reach_ID
   mutate(PointID=as.double(PointID))%>%
   filter(!is.na(PointID))
 
@@ -128,15 +129,15 @@ alt_df = left_join(a_df, p_df, by=c('UID2','LWR'))%>%
 
 
 #saving master_df and alt_df as rds and adding 3 in front of reach_ID to distinguish group 3 from 1 and 2
-saveRDS(master_df, paste0('outputs/munged_3/master_3',reach_ID,'.rds'))
-saveRDS(alt_df, paste0('outputs/munged_3/ALT_3',reach_ID,'.rds'))
+saveRDS(master_df, paste0('outputs/munged_3/master_',reach_ID,'.rds'))
+saveRDS(alt_df, paste0('outputs/munged_3/ALT_',reach_ID,'.rds'))
 
 
 
 
-#}
+}
 #lapply takes thing to be looped over in first position and the function in second position
-# lapply(g3_files,read_function)
-# read_function(g3_files[1])
+ lapply(g3_files,read_function)
+ #read_function(g3_files[1])
 
 

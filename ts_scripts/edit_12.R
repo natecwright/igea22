@@ -8,21 +8,15 @@ library(stringi)
 setwd('C:/Users/ncw02/Downloads/IGEA/')
 
 
-master=readRDS('outputs/master_ep7.rds')
-alt_df=readRDS('outputs/ALT_ep7.rds')
+g12_files = list.files('outputs/munged_12/')
+#input_file = "ALT_EP03.rds"
 
+edit_function = function(input_file){
 
-# find mean of all points & just water ----
-mean = mean(alt_df$ALT)
+reach_ID = substring(toupper(strsplit(input_file, "_")[[1]][2]), 1, 4)
 
-
-water = alt_df%>%
-  filter(LRW =='W')
-
-mean2 = mean(water$ALT)
-
-
-# ----
+master = readRDS(paste0('outputs/munged_12/master_',reach_ID,'.rds'))
+alt_df = readRDS(paste0('outputs/munged_12/ALT_',reach_ID,'.rds'))
 
 
 # edit the data to exclude all submerged water points----
@@ -85,13 +79,28 @@ submerged = rbind(most_water, x3_water, x8_water)%>%
 ultimate = rbind(ultimate, submerged)%>%
   filter(UID2 != 'EP7W381')
 
-saveRDS(ultimate, 'outputs/ALT_violin.rds')
+saveRDS(ultimate, 'outputs/ALT_violin_',reach_ID,'.rds')
+
+
+}
+
+lapply(g12_files,edit_function)
 
 
 
 # ----
 
+# find mean of all points & just water ----
+mean = mean(alt_df$ALT)
 
+
+water = alt_df%>%
+  filter(LRW =='W')
+
+mean2 = mean(water$ALT)
+
+
+# ----
 
 
 
