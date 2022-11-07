@@ -10,9 +10,9 @@ setwd('/Users/emmaboudreau/Documents/GitHub/igea22/')
 
 
 g3_files=list.files('raw_ts_data/group3.n')
-#input_file="3ep01_ts1.txt"
+input_file="3tp11_ts1.txt"
 
-read_function = function(input_file) {
+#read_function = function(input_file) {
   
   reach_ID = toupper(strsplit(input_file, "_")[[1]][1])
 
@@ -52,7 +52,10 @@ ts2_reach = read.delim(paste0('raw_ts_data/group3.n/',reach_ID,'_ts2.txt'),
                          header = FALSE, nrows= 1, dec = ".", sep = '\t')%>%
   transmute(Reach = V1)
 
-
+#rod height
+# ts1_HR = read.delim(paste0('raw_ts_data/group3/',reach_ID,'_ts1.txt'),
+#                        header = FALSE, skip = 115, nrows= 1, col.names= "RefHt", dec = ".", sep = '\t')#%>%
+  #transmute(old_height= V1)
 
 #read in total station txt files
 ts1_txt = read.delim(paste0('raw_ts_data/group3.n/',reach_ID,'_ts1.txt'),
@@ -144,7 +147,7 @@ saveRDS(alt_df, paste0('outputs/munged_3/ALT_',reach_ID,'.rds'))
 
 }
 #lapply takes thing to be looped over in first position and the function in second position
-lapply(g3_files,read_function)
+#lapply(g3_files,read_function)
  #read_function(g3_files[1])
 
 
