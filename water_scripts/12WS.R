@@ -13,9 +13,11 @@ WS1_df = read_xlsx('Raw_water_data/12WS.xlsx') #does this df includes G1 and G2 
 #normalize group12 data----
 #select and rename columns
 WS1_clean_df=WS1_df%>%
-  select('Line', 'Analysis', 'Inj Nr', 'd(18_16)Mean', 'd(D_H)Mean', 'Ignore', 'Identifier_1', 'Identifier_2')%>%
+  select('Line', 'd(18_16)Mean', 'd(D_H)Mean', 'Ignore', 'Identifier_1', 'Identifier_2')%>%
   rename("meanO"="d(18_16)Mean")%>%
   rename("meanH"="d(D_H)Mean")%>%
+  filter(Line >= 323)%>%
+  filter(Line <= 580)%>%
   filter(Ignore == 0)
 
 #create df for normalizing
@@ -35,7 +37,8 @@ modelH = lm(formula = standardH ~ meanH, data = WS1_norm_df)
 #create normalized df----
 WS1_final_df=WS1_clean_df%>%
   filter(Identifier_2=="sample")%>%
-  mutate(normO=modelO$coefficients[2]*meanO+modelO$coefficients[1]) #is this the best way to get the dependent variables of lm? is that what we want?
+  mutate(normO=modelO$coefficients[2]*meanO+modelO$coefficients[1])%>%
+  mutate(normH=modelH$coefficients[2]*meanH+modelH$coefficients[1])
 
 #notes----
 fprecip=(dground-dstream)/(dground-dprecip)
@@ -48,7 +51,7 @@ fprecip=(dground-dstream)/(dground-dprecip)
 # G1:5/30-6/5
 # G2: 6/8-6/16
 
-# hydrogen standards: (is the number after +/- the standard deviation? should we use this at any point?)
+# hydrogen standards:
 # picarro zero d2h=1.8+/-.9
 # picarro mid d2h=-159+/-1.3
 # picarro depl d2h=-235+/-1.8
