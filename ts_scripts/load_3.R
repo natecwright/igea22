@@ -22,14 +22,14 @@ input_file="3tp11_ts1.txt"
 #read in total station excel
 
 ts1_excel = read_xlsx('raw_ts_data/fd/fd3_ts1.xlsx')%>%
-  mutate(TS_code  = "1")%>%
-    filter(is.na(ERRORCODE))
+  mutate(TS_code  = "1")#%>%
+    #filter(is.na(ERRORCODE))
 
 
 
 ts2_excel = read_xlsx('raw_ts_data/fd/fd3_ts2.xlsx')%>%
-  mutate(TS_code  = "2")%>%
-  filter(is.na(ERRORCODE))
+  mutate(TS_code  = "2")#%>%
+  #filter(is.na(ERRORCODE))
   
   
 # names(ts1_excel) = make.names(names(ts1_excel), unique = TRUE)
@@ -52,18 +52,24 @@ ts2_reach = read.delim(paste0('raw_ts_data/group3.n/',reach_ID,'_ts2.txt'),
                          header = FALSE, nrows= 1, dec = ".", sep = '\t')%>%
   transmute(Reach = V1)
 
+
 #rod height
-# ts1_HR = read.delim(paste0('raw_ts_data/group3/',reach_ID,'_ts1.txt'),
-#                        header = FALSE, skip = 115, nrows= 1, col.names= "RefHt", dec = ".", sep = '\t')#%>%
-  #transmute(old_height= V1)
+ts1_HR = read.delim(paste0('raw_ts_data/group3/',reach_ID,'_ts1.txt'),
+                       header = FALSE, skip = 120, nrows= 1, dec = ".", sep = ',')%>%
+  transmute(rod_height= V7)
+
+ts2_HR = read.delim(paste0('raw_ts_data/group3/',reach_ID,'_ts2.txt'),
+                    header = FALSE, skip = 120, nrows= 1, dec = ".", sep = ',')%>%
+  transmute(rod_height= V7)
+
 
 #read in total station txt files
 ts1_txt = read.delim(paste0('raw_ts_data/group3.n/',reach_ID,'_ts1.txt'),
                       skip = 1, header = TRUE, dec = ".", sep = ',')%>%
   mutate(TS_code = "1")%>%
   mutate(Reach=ts1_reach$Reach)%>%
-  # mutate(Reach = gsub('3','', ts1_reach$Reach))%>%
-  mutate(PointID=as.double(PointID))#%>%
+  mutate(PointID=as.double(PointID))%>%
+  mutate(rod_height=ts1_HR$rod_height)
   #filter(!is.na(PointID))
 # manual intervention to get rid of PT 101 which was being problematic
 
@@ -73,8 +79,8 @@ ts2_txt = read.delim(paste0('raw_ts_data/group3.n/',reach_ID,'_ts2.txt'),
                       skip = 1, header = TRUE, dec = ".", sep = ',')%>%
   mutate(TS_code = "2")%>%
   mutate(Reach=ts2_reach$Reach)%>%
-  # mutate(Reach = gsub('3','', ts2_reach$Reach))%>% #trying to remove 3 from reach to match reach_ID
-  mutate(PointID=as.double(PointID))#%>%
+  mutate(PointID=as.double(PointID))%>%
+  mutate(rod_height=ts2_HR$rod_height)
   #filter(!is.na(PointID))
 
 
@@ -108,7 +114,9 @@ master_df = left_join(joined_df1, joined_df2, by=c('Reach', 'TS_code', 'PointID'
   mutate(UID2 = paste0(Reach,TS_code,LWR,number,XSection))%>%
   mutate(Elevation = as.double(str_remove_all(Elevation, ' ')))%>%
   filter(!PointID==101)%>%
-  filter(is.na(ERRORCODE))
+  mutate(newheight=ifelse(ERRORCODE==2,Elevation + (rod_height-ADJUSTMENT),Elevation))#%>%
+  # filter(ERRORCODE !="8")   #being problematic and removin all of TS1
+  #filter(is.na(ERRORCODE))
 #joined2_excel_txt_df = master_df[!(master_df$PointID==101),] #removing 101 from excel
 #!means not
   
@@ -145,7 +153,7 @@ saveRDS(alt_df, paste0('outputs/munged_3/ALT_',reach_ID,'.rds'))
 
 
 
-}
+#}
 #lapply takes thing to be looped over in first position and the function in second position
 #lapply(g3_files,read_function)
  #read_function(g3_files[1])
