@@ -8,7 +8,7 @@ library(stringr)
 setwd('/Users/Oskar/Documents/UMass/IGEA/igea22/')
 
 #group12 raw water data read-in----
-WS1_df = read_xlsx('Raw_water_data/12WS.xlsx') #does this df includes G1 and G2 data?
+WS1_df = read_xlsx('Raw_water_data/12WS.xlsx')
 
 #normalize group12 data----
 #select and rename columns
@@ -21,7 +21,7 @@ WS1_clean_df=WS1_df%>%
   filter(Ignore == 0)
 
 #create df for normalizing
-WS1_norm_df=WS1_clean_df%>%
+WS1_stand_df=WS1_clean_df%>%
   filter(Identifier_2 == "standard")%>%
   mutate(standardO=case_when(Identifier_1 == "Picarro zero 1 6_23_22" | Identifier_1 == "Picarro zero 2 6_23_22" | Identifier_1 == "Picarro zero 3 6_23_22"~.3,
                              Identifier_1 == "Picarro mid 3 6_23_22" | Identifier_1 == "Picarro mid 2 6_23_22"| Identifier_1 == "Picarro mid 1 6_23_22"~-20.6,
@@ -31,14 +31,29 @@ WS1_norm_df=WS1_clean_df%>%
                            Identifier_1 == "Picarro depl 3 6_23_22" | Identifier_1 == "Picarro depl 2 6_23_22"| Identifier_1 == "Picarro depl 1 6_23_22"~-235,))
 
 #linear regressions
-modelO = lm(formula = standardO ~ meanO, data = WS1_norm_df)
-modelH = lm(formula = standardH ~ meanH, data = WS1_norm_df)
+modelO = lm(formula = standardO ~ meanO, data = WS1_stand_df)
+modelH = lm(formula = standardH ~ meanH, data = WS1_stand_df)
 
 #create normalized df----
-WS1_final_df=WS1_clean_df%>%
+WS1_norm_df=WS1_clean_df%>%
   filter(Identifier_2=="sample")%>%
   mutate(normO=modelO$coefficients[2]*meanO+modelO$coefficients[1])%>%
   mutate(normH=modelH$coefficients[2]*meanH+modelH$coefficients[1])
+
+#create df of averages----
+WS1_avg_df = WS1_norm_df%>%
+  group_by(Identifier_1)%>%
+  summarize(avgO=mean(normO),avgH=mean(normH))
+
+#join averages with NEON data----
+ground_df = read_xlsx('Raw_water_data/NEON_ground.xlsx',sheet=2, skip=1)%>%
+  select('Latitude','Longitude','Elevation_mabsl','Sample_ID','Collection_Date','d2H','d18O')
+
+  strsplit(ground_df$Sample_ID, "_")
+  grep #try this instead
+
+precip_df = read_xlsx('Raw_water_data/NEON_precipitation.xlsx',sheet=2, skip=1)%>%
+  select('Latitude','Longitude','Elevation_mabsl','Sample_ID','Collection_Date','d2H','d18O')
 
 #notes----
 fprecip=(dground-dstream)/(dground-dprecip)
