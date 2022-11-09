@@ -53,6 +53,23 @@ ts2_reach = read.delim(paste0('raw_ts_data/group3.n/',reach_ID,'_ts2.txt'),
   transmute(Reach = V1)
 
 
+
+
+
+
+# ts1_col = read.delim(paste0('raw_ts_data/group3/',reach_ID,'_ts1.txt'),
+#                     header = FALSE, dec = ".", sep = ',')#%>%
+#   #transmute(rod_height= V7)
+# print(colnames(ts1_col))
+# transmute(V1)
+# ts1_test = read.delim(paste0('raw_ts_data/group3/',reach_ID,'_ts1.txt'),
+#                     header = TRUE, col.names, dec = ".", sep = ',')
+
+
+what=scan(paste0('raw_ts_data/group3/',reach_ID,'_ts1.txt'), what="RefHt",sep="")
+
+
+
 #rod height
 ts1_HR = read.delim(paste0('raw_ts_data/group3/',reach_ID,'_ts1.txt'),
                        header = FALSE, skip = 120, nrows= 1, dec = ".", sep = ',')%>%
