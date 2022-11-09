@@ -8,9 +8,9 @@ library(stringi)
 setwd('C:/Users/ncw02/Downloads/IGEA/')
 
 g12_files = list.files('raw_ts_data/group12.n')
-input_file = "tp05_ts1.txt"
+#input_file = "ep10_ts1.txt"
 
-#read_function = function(input_file){
+read_function = function(input_file){
 
 reach_ID = toupper(strsplit(input_file, "_")[[1]][1])
   
@@ -115,17 +115,22 @@ p_df = select(master_df, UID2, Cross.section, LRW, Type, Number, Elevation)%>%
 
 # joins active layer df and permafrost layer df and creates a new column with elevation difference
 alt_df = left_join(a_df, p_df, by=c('UID2','LRW', 'Number', 'Cross.section'))%>%
-  mutate(ALT = (ElevationA-ElevationP))
+  mutate(ALT = (ElevationA-ElevationP))%>%
+  filter(ALT > 0)
+
+print(input_file)
+print((nrow(alt_df) - length(unique(alt_df$UID2)))/nrow(alt_df))
+
 
 saveRDS(master_df, paste0('outputs/munged_12/master_',reach_ID,'.rds'))
 saveRDS(alt_df, paste0('outputs/munged_12/ALT_',reach_ID,'.rds'))
 
 
 
-#}
+}
 
 
-#lapply(g12_files,read_function)
+lapply(g12_files,read_function)
 
 # --------
 
