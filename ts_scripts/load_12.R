@@ -8,7 +8,7 @@ library(stringi)
 setwd('C:/Users/ncw02/Downloads/IGEA/')
 
 g12_files = list.files('raw_ts_data/group12.n')
-input_file = "ep16_ts1.txt"
+input_file = "tp05_ts1.txt"
 
 #read_function = function(input_file){
 
@@ -32,8 +32,6 @@ names(ts2_excel) = make.names(names(ts2_excel), unique = TRUE)
 
 metadata_excel = read_xlsx('raw_ts_data/fd/fd12_metadata.xlsx')%>%
   rename("Sample.elevation" = "Elevation")
-
-print(paste0('raw_ts_data/group12.n/',reach_ID,'_ts1.txt'))
 
 # extract reach from txt file for ts1 (should be identical for ts2)
 ts1_reach = read.delim(paste0('raw_ts_data/group12.n/',reach_ID,'_ts1.txt'),
@@ -102,7 +100,7 @@ master_df = rbind(joined_df3, joined_df4)%>%
 # separate A's and P's  ----
 
 a_df = select(master_df, UID2, Cross.section, LRW, Type, Number, Elevation)%>%
-  filter(Type =='A')%>% 
+  filter(Type == 'A')%>% 
   rename("Active" = "Type")%>% 
   rename("ElevationA" = "Elevation")
   #mutate(ElevationA = as.double(str_remove_all(ElevationA, ' '))) #removes weird spaces from text file and converts
