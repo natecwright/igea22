@@ -56,28 +56,33 @@ ts2_reach = read.delim(paste0('raw_ts_data/group3.n/',reach_ID,'_ts2.txt'),
 
 
 
+input1_file=paste0('raw_ts_data/group3/',reach_ID,'_ts1.txt')
+raw1_text=readLines(con=input1_file) #read every line
+index1_1=grep("END SETUP",raw1_text) #ts1 start of section
+index1_2=grep("END SLOPE",raw1_text) #ts1 end of section
 
-# ts1_col = read.delim(paste0('raw_ts_data/group3/',reach_ID,'_ts1.txt'),
-#                     header = FALSE, dec = ".", sep = ',')#%>%
-#   #transmute(rod_height= V7)
-# print(colnames(ts1_col))
-# transmute(V1)
-# ts1_test = read.delim(paste0('raw_ts_data/group3/',reach_ID,'_ts1.txt'),
-#                     header = TRUE, col.names, dec = ".", sep = ',')
+ts1_hr_df= read.delim(input1_file,
+                          header = TRUE, skip = index1_1, nrows= (index1_2-index1_1-2), dec = ".", sep = ',')%>%
+  rename(TgtID==pointID)
 
 
-what=scan(paste0('raw_ts_data/group3/',reach_ID,'_ts1.txt'), what="RefHt",sep="")
+input2_file=paste0('raw_ts_data/group3/',reach_ID,'_ts2.txt')
+raw2_text=readLines(con=input2_file) #read every line
+index2_1=grep("END SETUP",raw2_text) #ts2 start of section
+index2_2=grep("END SLOPE",raw2_text) #ts2 end of section
 
+ts2_hr_df= read.delim(input2_file,
+                      header = TRUE, skip = index2_1, nrows= (index2_2-index2_1-2), dec = ".", sep = ',')
 
 
 #rod height
-ts1_HR = read.delim(paste0('raw_ts_data/group3/',reach_ID,'_ts1.txt'),
-                       header = FALSE, skip = 120, nrows= 1, dec = ".", sep = ',')%>%
-  transmute(rod_height= V7)
-
-ts2_HR = read.delim(paste0('raw_ts_data/group3/',reach_ID,'_ts2.txt'),
-                    header = FALSE, skip = 120, nrows= 1, dec = ".", sep = ',')%>%
-  transmute(rod_height= V7)
+# ts1_HR = read.delim(input_file,
+#                        header = FALSE, skip = 120, nrows= 1, dec = ".", sep = ',')%>%
+#   transmute(rod_height= V7)
+# 
+# ts2_HR = read.delim(paste0('raw_ts_data/group3/',reach_ID,'_ts2.txt'),
+#                     header = FALSE, skip = 120, nrows= 1, dec = ".", sep = ',')%>%
+#   transmute(rod_height= V7)
 
 
 #read in total station txt files
@@ -86,7 +91,8 @@ ts1_txt = read.delim(paste0('raw_ts_data/group3.n/',reach_ID,'_ts1.txt'),
   mutate(TS_code = "1")%>%
   mutate(Reach=ts1_reach$Reach)%>%
   mutate(PointID=as.double(PointID))%>%
-  mutate(rod_height=ts1_HR$rod_height)
+  filter(!PointID==101)
+  mutate(rod_height=ts1_hr_df$RefHt)
   #filter(!is.na(PointID))
 # manual intervention to get rid of PT 101 which was being problematic
 
@@ -97,7 +103,7 @@ ts2_txt = read.delim(paste0('raw_ts_data/group3.n/',reach_ID,'_ts2.txt'),
   mutate(TS_code = "2")%>%
   mutate(Reach=ts2_reach$Reach)%>%
   mutate(PointID=as.double(PointID))%>%
-  mutate(rod_height=ts2_HR$rod_height)
+  mutate(rod_height=ts2_hr_df$RefHt)
   #filter(!is.na(PointID))
 
 
