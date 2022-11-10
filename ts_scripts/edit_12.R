@@ -9,7 +9,7 @@ setwd('C:/Users/ncw02/Downloads/IGEA/')
 
 
 g12_files = list.files('outputs/munged_12/')
-#input_file = "ALT_TP05.rds"
+#input_file = "ALT_TP06.rds"
 
 edit_function = function(input_file){
 
@@ -85,26 +85,8 @@ saveRDS(ultimate, paste0('outputs/munged_12/ALT_violin_',reach_ID,'.rds'))
 
 }
 
-lapply(g12_files,edit_function)
+dummy = lapply(g12_files,edit_function)
 
-
-
-
-
-
-
-
-# find mean of all points & just water ----
-mean = mean(alt_df$ALT)
-
-
-water = alt_df%>%
-  filter(LRW =='W')
-
-mean2 = mean(water$ALT)
-
-
-# ----
 
 
 
