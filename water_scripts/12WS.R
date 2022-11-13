@@ -7,10 +7,9 @@ library(stringr)
 
 setwd('/Users/Oskar/Documents/UMass/IGEA/igea22/')
 
-#group12 raw water data read-in----
+#group12 raw water data reading-in and normalization----
 WS1_df = read_xlsx('Raw_water_data/12WS.xlsx')
 
-#normalize group12 data----
 #select and rename columns
 WS1_clean_df=WS1_df%>%
   select('Line', 'd(18_16)Mean', 'd(D_H)Mean', 'Ignore', 'Identifier_1', 'Identifier_2')%>%
@@ -34,23 +33,27 @@ WS1_stand_df=WS1_clean_df%>%
 modelO = lm(formula = standardO ~ meanO, data = WS1_stand_df)
 modelH = lm(formula = standardH ~ meanH, data = WS1_stand_df)
 
-#create normalized df----
+#create normalized df
 WS1_norm_df=WS1_clean_df%>%
   filter(Identifier_2=="sample")%>%
   mutate(normO=modelO$coefficients[2]*meanO+modelO$coefficients[1])%>%
   mutate(normH=modelH$coefficients[2]*meanH+modelH$coefficients[1])
 
-#create df of averages----
+#average isotope ratios and join with NEON data----
 WS1_avg_df = WS1_norm_df%>%
   group_by(Identifier_1)%>%
   summarize(avgO=mean(normO),avgH=mean(normH))
 
-#join averages with NEON data----
+#join averages with NEON data
 ground_df = read_xlsx('Raw_water_data/NEON_ground.xlsx',sheet=2, skip=1)%>%
   select('Latitude','Longitude','Elevation_mabsl','Sample_ID','Collection_Date','d2H','d18O')
 
-  strsplit(ground_df$Sample_ID, "_")
-  grep #try this instead
+strsplit(ground_df$Sample_ID, "_")%>%
+    sapply("[",2)%>%
+  strsplit("[.]")%>%
+    sapply("[",1)
+
+#try grep instead
 
 precip_df = read_xlsx('Raw_water_data/NEON_precipitation.xlsx',sheet=2, skip=1)%>%
   select('Latitude','Longitude','Elevation_mabsl','Sample_ID','Collection_Date','d2H','d18O')
