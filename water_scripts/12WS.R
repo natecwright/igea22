@@ -57,10 +57,13 @@ precip_df = read_xlsx('Raw_water_data/NEON_precipitation.xlsx',sheet=2, skip=1)%
   select('Latitude','Longitude','Elevation_mabsl','Sample_ID','Collection_Date','d2H','d18O')
 
 #extract 4-letter site ID from Sample_ID
-strsplit(ground_df$Sample_ID, "_")%>%
+Site_ID = strsplit(ground_df$Sample_ID, "_")%>%
     sapply("[",2)%>%
   strsplit("[.]")%>%
     sapply("[",1)
+
+ground_df = ground_df%>%
+  mutate(Site_ID = Site_ID)
 
 #try grep instead
 
