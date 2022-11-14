@@ -45,19 +45,24 @@ WS1_avg_df = WS1_norm_df%>%
   group_by(Identifier_1)%>%
   summarize(avgO=mean(normO),avgH=mean(normH))
 
-#join averages with NEON data
+#join averages with metadata
+metadata_df = read_xlsx('raw_ts_data/fd/fd12_metadata.xlsx')
+
+#join our data with NEON data
+#read in NEON data
 ground_df = read_xlsx('Raw_water_data/NEON_ground.xlsx',sheet=2, skip=1)%>%
   select('Latitude','Longitude','Elevation_mabsl','Sample_ID','Collection_Date','d2H','d18O')
 
+precip_df = read_xlsx('Raw_water_data/NEON_precipitation.xlsx',sheet=2, skip=1)%>%
+  select('Latitude','Longitude','Elevation_mabsl','Sample_ID','Collection_Date','d2H','d18O')
+
+#extract 4-letter site ID from Sample_ID
 strsplit(ground_df$Sample_ID, "_")%>%
     sapply("[",2)%>%
   strsplit("[.]")%>%
     sapply("[",1)
 
 #try grep instead
-
-precip_df = read_xlsx('Raw_water_data/NEON_precipitation.xlsx',sheet=2, skip=1)%>%
-  select('Latitude','Longitude','Elevation_mabsl','Sample_ID','Collection_Date','d2H','d18O')
 
 #notes----
 fprecip=(dground-dstream)/(dground-dprecip)
