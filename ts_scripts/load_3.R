@@ -10,9 +10,9 @@ setwd('/Users/emmaboudreau/Documents/GitHub/igea22/')
 
 
 g3_files=list.files('raw_ts_data/group3.n')
-input_file="3tp11_ts1.txt"
+#input_file="3tp11_ts1.txt"
 
-#read_function = function(input_file) {
+read_function = function(input_file) {
   
   reach_ID = toupper(strsplit(input_file, "_")[[1]][1])
 
@@ -63,7 +63,9 @@ index1_2=grep("END SLOPE",raw1_text) #ts1 end of section
 
 ts1_hr_df= read.delim(input1_file,
                           header = TRUE, skip = index1_1, nrows= (index1_2-index1_1-2), dec = ".", sep = ',')%>%
-  rename(TgtID==pointID)
+  rename("PointID"="TgtID")%>%
+  rename("HR"="RefHt")%>%
+  filter(!PointID==101)
 
 
 input2_file=paste0('raw_ts_data/group3/',reach_ID,'_ts2.txt')
@@ -72,17 +74,12 @@ index2_1=grep("END SETUP",raw2_text) #ts2 start of section
 index2_2=grep("END SLOPE",raw2_text) #ts2 end of section
 
 ts2_hr_df= read.delim(input2_file,
-                      header = TRUE, skip = index2_1, nrows= (index2_2-index2_1-2), dec = ".", sep = ',')
+                      header = TRUE, skip = index2_1, nrows= (index2_2-index2_1-2), dec = ".", sep = ',')%>%
+  rename("PointID"="TgtID")%>%
+  rename("HR"="RefHt")%>%
+  filter(!PointID==101)
 
 
-#rod height
-# ts1_HR = read.delim(input_file,
-#                        header = FALSE, skip = 120, nrows= 1, dec = ".", sep = ',')%>%
-#   transmute(rod_height= V7)
-# 
-# ts2_HR = read.delim(paste0('raw_ts_data/group3/',reach_ID,'_ts2.txt'),
-#                     header = FALSE, skip = 120, nrows= 1, dec = ".", sep = ',')%>%
-#   transmute(rod_height= V7)
 
 
 #read in total station txt files
@@ -91,10 +88,10 @@ ts1_txt = read.delim(paste0('raw_ts_data/group3.n/',reach_ID,'_ts1.txt'),
   mutate(TS_code = "1")%>%
   mutate(Reach=ts1_reach$Reach)%>%
   mutate(PointID=as.double(PointID))%>%
-  filter(!PointID==101)
-  mutate(rod_height=ts1_hr_df$RefHt)
-  #filter(!is.na(PointID))
-# manual intervention to get rid of PT 101 which was being problematic
+  filter(!PointID==101)%>%
+  mutate(HR=ts1_hr_df$HR)
+
+
 
 
   
@@ -103,8 +100,9 @@ ts2_txt = read.delim(paste0('raw_ts_data/group3.n/',reach_ID,'_ts2.txt'),
   mutate(TS_code = "2")%>%
   mutate(Reach=ts2_reach$Reach)%>%
   mutate(PointID=as.double(PointID))%>%
-  mutate(rod_height=ts2_hr_df$RefHt)
-  #filter(!is.na(PointID))
+  filter(!PointID==101)%>%
+  mutate(HR=ts2_hr_df$HR)
+ 
 
 
 
@@ -116,14 +114,13 @@ print(toupper(reach_ID))
 
 #row bind excel files for ts1 and ts2
 joined_df1 = rbind(ts1_excel,ts2_excel)%>%
-  #filter(Reach==toupper(reach_ID))%>%
   filter(Reach==reach_ID)%>%
   filter(!is.na(XSection)) #remove PT 101
 
 #row bind txt files for ts1 and ts2
 joined_df2 = rbind(ts1_txt,ts2_txt)
 
-  #select(joined_df4,-Code) #trying to delete column code
+ 
 
 
 #created data frame with excel and text file for specific reach
@@ -137,11 +134,12 @@ master_df = left_join(joined_df1, joined_df2, by=c('Reach', 'TS_code', 'PointID'
   mutate(UID2 = paste0(Reach,TS_code,LWR,number,XSection))%>%
   mutate(Elevation = as.double(str_remove_all(Elevation, ' ')))%>%
   filter(!PointID==101)%>%
-  mutate(newheight=ifelse(ERRORCODE==2,Elevation + (rod_height-ADJUSTMENT),Elevation))#%>%
-  # filter(ERRORCODE !="8")   #being problematic and removin all of TS1
-  #filter(is.na(ERRORCODE))
-#joined2_excel_txt_df = master_df[!(master_df$PointID==101),] #removing 101 from excel
-#!means not
+  mutate(newheight=ifelse(ERRORCODE==2,Elevation + (HR-ADJUSTMENT),Elevation)) #else statement not working
+  # if (ERRORCODE==is.na){
+  #   newheight==Elevation
+  # }
+  #filter(!ERRORCODE==8)   #being problematic and removin all of TS1
+
   
   
 
@@ -176,9 +174,9 @@ saveRDS(alt_df, paste0('outputs/munged_3/ALT_',reach_ID,'.rds'))
 
 
 
-#}
+}
 #lapply takes thing to be looped over in first position and the function in second position
-#lapply(g3_files,read_function)
+lapply(g3_files,read_function)
  #read_function(g3_files[1])
 
 
