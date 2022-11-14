@@ -4,6 +4,7 @@ library(dplyr)
 library(readxl)
 library(tidyr)
 library(stringr)
+library(fuzzyjoin)
 
 setwd('/Users/Oskar/Documents/UMass/IGEA/igea22/')
 
