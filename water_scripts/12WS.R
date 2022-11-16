@@ -40,23 +40,31 @@ WS1_norm_df=WS1_clean_df%>%
   mutate(normO=modelO$coefficients[2]*meanO+modelO$coefficients[1])%>%
   mutate(normH=modelH$coefficients[2]*meanH+modelH$coefficients[1])
 
-#average isotope ratios and join with NEON data----
+#average isotope ratios and join with metadata----
 WS1_avg_df = WS1_norm_df%>%
   group_by(Identifier_1)%>%
-  summarize(avgO=mean(normO),avgH=mean(normH))
+  summarize(avgO=mean(normO),avgH=mean(normH))%>%
+  transmute(Label=Identifier_1,avgO=avgO,avgH=avgH)
 
 #join averages with metadata
-metadata_df = read_xlsx('raw_ts_data/fd/fd12_metadata.xlsx')
+metadata_df = read_xlsx('Raw_water_data/12metadata.xlsx')%>%
+  mutate(newtime = sapply(strsplit(as.character(Sample_Time), " "),"[",2))%>%
+  mutate(newdate = paste(Date, newtime, sep = " "))%>%
+  mutate(date_time=as.POSIXct(newdate,tz="US/Alaska"))
 
-#join our data with NEON data
+BCC = left_join(WS1_avg_df,metadata_df,"Label")
+
+#join our data with NEON data----
 #read in NEON data
 ground_df = read_xlsx('Raw_water_data/NEON_ground.xlsx',sheet=2, skip=1)%>%
-  select('Latitude','Longitude','Elevation_mabsl','Sample_ID','Collection_Date','d2H','d18O')
+  select('Latitude','Longitude','Elevation_mabsl','Sample_ID','Collection_Date','d2H','d18O')%>%
+  mutate(date_time=as.POSIXct(Collection_Date,tz="US/Alaska"))
 
 precip_df = read_xlsx('Raw_water_data/NEON_precipitation.xlsx',sheet=2, skip=1)%>%
-  select('Latitude','Longitude','Elevation_mabsl','Sample_ID','Collection_Date','d2H','d18O')
+  select('Latitude','Longitude','Elevation_mabsl','Sample_ID','Collection_Date','d2H','d18O')%>%
+  mutate(date_time=as.POSIXct(Collection_Date,tz="US/Alaska"))
 
-#extract 4-letter site ID from Sample_ID
+#don't need: extract 4-letter site ID from Sample_ID in ground_df (could try grep instead of strsplit)----
 Site_ID = strsplit(ground_df$Sample_ID, "_")%>%
     sapply("[",2)%>%
   strsplit("[.]")%>%
@@ -65,15 +73,13 @@ Site_ID = strsplit(ground_df$Sample_ID, "_")%>%
 ground_df = ground_df%>%
   mutate(Site_ID = Site_ID)
 
-#try grep instead
-
 #notes----
 fprecip=(dground-dstream)/(dground-dprecip)
 
 # need to:
 # find the average or mean for normO each sample (4,5,6=INJ Nrb)
 # find closest date to our sample in NEON data
-# decide or try to NEON data closest to sample date over all data given or the closetst year (2021)
+# decide or try to NEON data closest to sample date over all data given or the closest year (2021)
 # 
 # G1:5/30-6/5
 # G2: 6/8-6/16
@@ -82,5 +88,3 @@ fprecip=(dground-dstream)/(dground-dprecip)
 # picarro zero d2h=1.8+/-.9
 # picarro mid d2h=-159+/-1.3
 # picarro depl d2h=-235+/-1.8
-
-
