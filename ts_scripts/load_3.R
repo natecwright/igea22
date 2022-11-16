@@ -10,7 +10,7 @@ setwd('/Users/emmaboudreau/Documents/GitHub/igea22/')
 
 
 g3_files=list.files('raw_ts_data/group3.n')
-#input_file="3tp11_ts1.txt"
+#input_file="3ep07_ts1.txt"
 
 read_function = function(input_file) {
   
@@ -61,11 +61,14 @@ raw1_text=readLines(con=input1_file) #read every line
 index1_1=grep("END SETUP",raw1_text) #ts1 start of section
 index1_2=grep("END SLOPE",raw1_text) #ts1 end of section
 
+print(input1_file)
+
+
 ts1_hr_df= read.delim(input1_file,
                           header = TRUE, skip = index1_1, nrows= (index1_2-index1_1-2), dec = ".", sep = ',')%>%
   rename("PointID"="TgtID")%>%
   rename("HR"="RefHt")%>%
-  filter(!PointID==101)
+  filter(PointID!=101)
 
 
 input2_file=paste0('raw_ts_data/group3/',reach_ID,'_ts2.txt')
@@ -73,11 +76,14 @@ raw2_text=readLines(con=input2_file) #read every line
 index2_1=grep("END SETUP",raw2_text) #ts2 start of section
 index2_2=grep("END SLOPE",raw2_text) #ts2 end of section
 
+print(input2_file)
+print(index2_2)
+
 ts2_hr_df= read.delim(input2_file,
                       header = TRUE, skip = index2_1, nrows= (index2_2-index2_1-2), dec = ".", sep = ',')%>%
   rename("PointID"="TgtID")%>%
   rename("HR"="RefHt")%>%
-  filter(!PointID==101)
+  filter(PointID!=101)
 
 
 
@@ -115,7 +121,8 @@ print(toupper(reach_ID))
 #row bind excel files for ts1 and ts2
 joined_df1 = rbind(ts1_excel,ts2_excel)%>%
   filter(Reach==reach_ID)%>%
-  filter(!is.na(XSection)) #remove PT 101
+  filter(!is.na(XSection)) %>% #remove PT 101
+  mutate(ERRORCODE=ifelse(is.na(ERRORCODE),0,ERRORCODE))
 
 #row bind txt files for ts1 and ts2
 joined_df2 = rbind(ts1_txt,ts2_txt)
@@ -133,12 +140,9 @@ master_df = left_join(joined_df1, joined_df2, by=c('Reach', 'TS_code', 'PointID'
   mutate(number = substr(uniqueID,11,11))%>%
   mutate(UID2 = paste0(Reach,TS_code,LWR,number,XSection))%>%
   mutate(Elevation = as.double(str_remove_all(Elevation, ' ')))%>%
-  filter(!PointID==101)%>%
-  mutate(newheight=ifelse(ERRORCODE==2,Elevation + (HR-ADJUSTMENT),Elevation)) #else statement not working
-  # if (ERRORCODE==is.na){
-  #   newheight==Elevation
-  # }
-  #filter(!ERRORCODE==8)   #being problematic and removin all of TS1
+  filter(PointID!=101)%>%
+  mutate(newelev=ifelse(ERRORCODE==2,Elevation + (HR-ADJUSTMENT),Elevation))%>% #adjustment for HR change if errorcode is 2
+  filter(ERRORCODE!="8")   #remove error code 8
 
   
   
@@ -147,17 +151,17 @@ master_df = left_join(joined_df1, joined_df2, by=c('Reach', 'TS_code', 'PointID'
 
 
 
-a_df = select(master_df, UID2, AP, LWR, Elevation)%>%
+a_df = select(master_df, UID2, AP, LWR, newelev)%>%
   filter(AP =='A')%>% 
   rename("Active" = "AP")%>% 
-  rename("ElevationA" = "Elevation")
+  rename("ElevationA" = "newelev")
 
 
 
-p_df = select(master_df, UID2, AP, LWR, Elevation)%>%
+p_df = select(master_df, UID2, AP, LWR, newelev)%>%
   filter(AP =='P')%>% 
   rename("Permafrost" = "AP")%>% 
-  rename("ElevationP" = "Elevation")
+  rename("ElevationP" = "newelev")
 
 
 
