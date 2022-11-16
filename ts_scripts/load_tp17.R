@@ -31,12 +31,12 @@ metadata_excel = read_xlsx('raw_ts_data/fd/fd12_metadata.xlsx')%>%
   rename("Sample.elevation" = "Elevation")
 
 # extract reach from txt file for ts2 (should be identical for ts1)
-ts2_reach = read.delim(paste0('raw_ts_data/group12.n/',reach_ID,'_ts2.txt'),
+ts2_reach = read.delim('raw_ts_data/tp17_ts2.txt',
                         header = FALSE, nrows= 1, dec = ".", sep = '\t')%>%
   transmute(Reach = V1)
 
 # read in ts2 xyz
-ts2_txt = read.delim(paste0('raw_ts_data/group12.n/',reach_ID,'_ts2.txt'),
+ts2_txt = read.delim('raw_ts_data/tp17_ts2.txt',
                       skip = 1, header = TRUE, dec = ".", sep = ',')%>%
   mutate(TS_code = "2")%>%
   mutate(Reach = ts2_reach$Reach)%>%
