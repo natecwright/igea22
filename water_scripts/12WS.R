@@ -52,17 +52,20 @@ metadata_df = read_xlsx('Raw_water_data/12metadata.xlsx')%>%
   mutate(newdate = paste(Date, newtime, sep = " "))%>%
   mutate(date_time=as.POSIXct(newdate,tz="US/Alaska"))
 
-BCC = left_join(WS1_avg_df,metadata_df,"Label")
+our_df = left_join(WS1_avg_df,metadata_df,"Label")
 
 #join our data with NEON data----
 #read in NEON data
-ground_df = read_xlsx('Raw_water_data/NEON_ground.xlsx',sheet=2, skip=1)%>%
+ground_df = read_xlsx('Raw_water_data/NEON_ground_111622.xlsx')%>%
   select('Latitude','Longitude','Elevation_mabsl','Sample_ID','Collection_Date','d2H','d18O')%>%
   mutate(date_time=as.POSIXct(Collection_Date,tz="US/Alaska"))
 
 precip_df = read_xlsx('Raw_water_data/NEON_precipitation.xlsx',sheet=2, skip=1)%>%
   select('Latitude','Longitude','Elevation_mabsl','Sample_ID','Collection_Date','d2H','d18O')%>%
   mutate(date_time=as.POSIXct(Collection_Date,tz="US/Alaska"))
+
+#don't need: join by time within 2 weeks
+by_time=difference_inner_join(our_df,ground_df,by='date_time',max_dist=10080,distance_col='time_diff')
 
 #don't need: extract 4-letter site ID from Sample_ID in ground_df (could try grep instead of strsplit)----
 Site_ID = strsplit(ground_df$Sample_ID, "_")%>%
