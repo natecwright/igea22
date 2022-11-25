@@ -43,51 +43,37 @@ WS1_norm_df=WS1_clean_df%>%
 #average isotope ratios and join with metadata----
 WS1_avg_df = WS1_norm_df%>%
   group_by(Identifier_1)%>%
-  summarize(avgO=mean(normO),avgH=mean(normH))%>%
-  transmute(Label=Identifier_1,avgO=avgO,avgH=avgH)
+  summarize(avgO=mean(normO),avgH=mean(normH))
 
 #join averages with metadata
 metadata_df = read_xlsx('Raw_water_data/12metadata.xlsx')%>%
   mutate(newtime = sapply(strsplit(as.character(Sample_Time), " "),"[",2))%>%
   mutate(newdate = paste(Date, newtime, sep = " "))%>%
-  mutate(date_time=as.POSIXct(newdate,tz="US/Alaska"))
+  mutate(date_time=as.POSIXct(newdate,tz="US/Alaska"))%>%
+  mutate(doy=as.numeric(strftime(date_time, format = "%j")))
 
-our_df = left_join(WS1_avg_df,metadata_df,"Label")
+our_df = left_join(WS1_avg_df,metadata_df,"Identifier_1")
 
 #join our data with NEON data----
 #read in NEON data
 ground_df = read_xlsx('Raw_water_data/NEON_ground_111622.xlsx')%>%
   select('Latitude','Longitude','Elevation_mabsl','Sample_ID','Collection_Date','d2H','d18O')%>%
-  mutate(date_time=as.POSIXct(Collection_Date,tz="US/Alaska"))
+  mutate(date_time=as.POSIXct(Collection_Date,tz="US/Alaska"))%>%
+  mutate(doy=as.numeric(strftime(date_time, format = "%j")))
 
 precip_df = read_xlsx('Raw_water_data/NEON_precipitation.xlsx',sheet=2, skip=1)%>%
   select('Latitude','Longitude','Elevation_mabsl','Sample_ID','Collection_Date','d2H','d18O')%>%
-  mutate(date_time=as.POSIXct(Collection_Date,tz="US/Alaska"))
+  mutate(date_time=as.POSIXct(Collection_Date,tz="US/Alaska"))%>%
+  mutate(doy=as.numeric(strftime(date_time, format = "%j")))
 
-#don't need: join by time within 2 weeks
-by_time=difference_inner_join(our_df,ground_df,by='date_time',max_dist=10080,distance_col='time_diff')
+#filter for North Slope
+ground_NS_df = ground_df%>%
+  filter(between(Latitude,68,69))%>%
+  mutate(Site_ID=case_when(Longitude >= -149.4~"TOOK",
+                           Longitude < -149.4~"OKSR"))
+#DO SAME FOR precip_df (are lat/long for sites the same?)
 
-#don't need: extract 4-letter site ID from Sample_ID in ground_df (could try grep instead of strsplit)----
-Site_ID = strsplit(ground_df$Sample_ID, "_")%>%
-    sapply("[",2)%>%
-  strsplit("[.]")%>%
-    sapply("[",1)
+#join by doy within 14
+by_time=difference_inner_join(our_df,ground_NS_df,by='doy',max_dist=14,distance_col='days_apart')
 
-ground_df = ground_df%>%
-  mutate(Site_ID = Site_ID)
-
-#notes----
-fprecip=(dground-dstream)/(dground-dprecip)
-
-# need to:
-# find the average or mean for normO each sample (4,5,6=INJ Nrb)
-# find closest date to our sample in NEON data
-# decide or try to NEON data closest to sample date over all data given or the closest year (2021)
-# 
-# G1:5/30-6/5
-# G2: 6/8-6/16
-
-# hydrogen standards:
-# picarro zero d2h=1.8+/-.9
-# picarro mid d2h=-159+/-1.3
-# picarro depl d2h=-235+/-1.8
+#yet to do: calculate fraction resembling ground and precip for each sample for which a match is found
