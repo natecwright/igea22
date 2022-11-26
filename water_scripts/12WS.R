@@ -5,6 +5,7 @@ library(readxl)
 library(tidyr)
 library(stringr)
 library(fuzzyjoin)
+library(gmt)
 
 setwd('/Users/Oskar/Documents/UMass/IGEA/igea22/')
 
@@ -71,9 +72,18 @@ ground_NS_df = ground_df%>%
   filter(between(Latitude,68,69))%>%
   mutate(Site_ID=case_when(Longitude >= -149.4~"TOOK",
                            Longitude < -149.4~"OKSR"))
-#DO SAME FOR precip_df (are lat/long for sites the same?)
 
-#join by doy within 14
-by_time=difference_inner_join(our_df,ground_NS_df,by='doy',max_dist=14,distance_col='days_apart')
+precip_NS_df = precip_df%>%
+  filter(between(Latitude,68,69))
 
-#yet to do: calculate fraction resembling ground and precip for each sample for which a match is found
+#yet to try----
+#join by doy within 365, created weighted column (inverse of days_apart)
+by_time=difference_inner_join(our_df,precip_NS_df,by='doy',max_dist=365,distance_col='days_apart')%>%
+  mutate(weights=1/'doy')
+#weighted.mean within summarize
+
+#join by coordinates -- geodist doen't accept UTM
+by_dist=geodist(our_df$Latitude, our_df$Longitude, precip_NS_df$Latitude, precip_NS_df$Longitude)
+
+#yet to do----
+#calculate fraction resembling ground and precip for each sample for which a match is found
