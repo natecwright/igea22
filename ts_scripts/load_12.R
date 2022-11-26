@@ -8,11 +8,11 @@ library(stringi)
 setwd('C:/Users/ncw02/Downloads/IGEA/')
 
 g12_files = list.files('raw_ts_data/group12.n')
-#input_file = "ep10_ts1.txt"
+#input_file = "tp06_ts1.txt"
 
 read_function = function(input_file){
 
-reach_ID = toupper(strsplit(input_file, "_")[[1]][1])
+reach_ID = strsplit(input_file, "_")[[1]][1]
   
 # read in data ----------
 # setwd (path to the data)
@@ -69,6 +69,8 @@ ts2_txt = ts2_txt[2:nrow(ts2_txt),]
 
 
 # join data frames ----
+reach_ID = toupper(reach_ID)
+print(reach_ID)
 
 # this joins excel (digitized data) with metadata for ts1
 joined_df1 = left_join(ts1_excel, metadata_excel, by='Reach')%>%
@@ -90,9 +92,7 @@ master_df = rbind(joined_df3, joined_df4)%>%
   mutate(Type = substr(uniqueID,9,9))%>%
   mutate(Number = substr(uniqueID,10,10))%>%
   mutate(UID2 = paste0(Reach, LRW, Number, Cross.section, TS_code))%>%
-  mutate(Elevation = as.double(str_remove_all(Elevation, ' ')))#%>%
-  #filter(PointID != '147')%>%
-  #filter(PointID != '148')
+  mutate(Elevation = as.double(str_remove_all(Elevation, ' ')))
 
 # -------
 
