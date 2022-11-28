@@ -6,6 +6,7 @@ library(tidyr)
 library(stringr)
 library(fuzzyjoin)
 library(gmt)
+library(rgdal)
 
 setwd('/Users/Oskar/Documents/UMass/IGEA/igea22/')
 
@@ -55,8 +56,7 @@ metadata_df = read_xlsx('Raw_water_data/12metadata.xlsx')%>%
 
 our_df = left_join(WS1_avg_df,metadata_df,"Identifier_1")
 
-#join our data with NEON data----
-#read in NEON data
+#read in NEON data----
 ground_df = read_xlsx('Raw_water_data/NEON_ground_111622.xlsx')%>%
   select('Latitude','Longitude','Elevation_mabsl','Sample_ID','Collection_Date','d2H','d18O')%>%
   mutate(date_time=as.POSIXct(Collection_Date,tz="US/Alaska"))%>%
@@ -76,14 +76,18 @@ ground_NS_df = ground_df%>%
 precip_NS_df = precip_df%>%
   filter(between(Latitude,68,69))
 
+#join by coordinates----
+
+ground_latlon = SpatialPoints(cbind(ground_NS_df$Longitude, -ground_NS_df$Latitude), proj4string=CRS("+proj=longlat"))
+ground_utm = spTransform(ground_coords, CRS("+init=epsg:32606"))
+
+by_dist=geodist(our_df$Latitude, our_df$Longitude, precip_NS_df$Latitude, precip_NS_df$Longitude)
+
 #yet to try----
 #join by doy within 365, created weighted column (inverse of days_apart)
 by_time=difference_inner_join(our_df,precip_NS_df,by='doy',max_dist=365,distance_col='days_apart')%>%
   mutate(weights=1/'doy')
 #weighted.mean within summarize
-
-#join by coordinates -- geodist doen't accept UTM
-by_dist=geodist(our_df$Latitude, our_df$Longitude, precip_NS_df$Latitude, precip_NS_df$Longitude)
 
 #yet to do----
 #calculate fraction resembling ground and precip for each sample for which a match is found
