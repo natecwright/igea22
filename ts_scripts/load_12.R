@@ -47,7 +47,7 @@ ts2_reach = read.delim(paste0('raw_ts_data/group12.n/',reach_ID,'_ts2.txt'),
 
 # let's make some ADJUSTMENTS and read in the ts data ----
 
-# next four blocks apparently grab all rod heights
+# next four blocks apparently grab all rod heights and whiz it up
 input1_file=paste0('raw_ts_data/group12/',reach_ID,'_ts1.txt')
 raw1_text=readLines(con=input1_file) #read every line
 index1_1=grep("END SETUP",raw1_text) #ts1 start of section
@@ -56,8 +56,7 @@ index1_2=grep("END SLOPE",raw1_text) #ts1 end of section
 ts1_hr_df= read.delim(input1_file,
                       header = TRUE, skip = index1_1, nrows= (index1_2-index1_1-2), dec = ".", sep = ',')%>%
   rename("PointID"="TgtID")%>%
-  rename("HR"="RefHt")%>%
-  filter(PointID!=101)
+  rename("HR"="RefHt")
 
 
 input2_file=paste0('raw_ts_data/group12/',reach_ID,'_ts2.txt')
@@ -68,9 +67,9 @@ index2_2=grep("END SLOPE",raw2_text) #ts2 end of section
 ts2_hr_df= read.delim(input2_file,
                       header = TRUE, skip = index2_1, nrows= (index2_2-index2_1-2), dec = ".", sep = ',')%>%
   rename("PointID"="TgtID")%>%
-  rename("HR"="RefHt")%>%
-  filter(PointID!=101)
+  rename("HR"="RefHt")
 
+#----
 
 # read in ts1&2 xyz ----
 ts1_txt = read.delim(paste0('raw_ts_data/group12.n/',reach_ID,'_ts1.txt'),
@@ -93,9 +92,6 @@ ts2_txt = ts2_txt[2:nrow(ts2_txt),]
 
 
 #----
-
-
-# -------------------
 
 
 # JOIN DATA FRAMES ----
@@ -126,7 +122,7 @@ master_df = rbind(joined_df3, joined_df4)%>%
   mutate(newelev=ifelse(ERRORCODE==2,Elevation + (HR-ADJUSTMENT),Elevation))%>% #adjustment for HR change if errorcode is 2
   filter(ERRORCODE!="8") 
 
-# -------
+# ----
 
 
 # SEPARATE A's & P's  ----
@@ -161,6 +157,6 @@ saveRDS(alt_df, paste0('outputs/munged_12/ALT_',reach_ID,'.rds'))
 
 #lapply(g12_files,read_function)
 
-# --------
+# ----
 
 
