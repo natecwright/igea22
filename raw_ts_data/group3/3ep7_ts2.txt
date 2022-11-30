@@ -151,9 +151,9 @@ THEODOLITE
                 STN_NO  343932931
                 STN_ID  "TS2"
                 INST_HT 1.530000;
-
+        END SETUP
         SLOPE (TgtNo, TgtID, CfgNo, Hz, Vz, SDist, RefHt, Date, Ppm, ApplType, Flags)
-        
+        END SLOPE
         SETUP
                 STN_NO  343932932
                 STN_ID  "TS2"
