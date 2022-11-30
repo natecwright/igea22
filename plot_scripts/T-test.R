@@ -7,7 +7,7 @@ library(readxl)
 #library(rstatix)
 
 #setwd(path to data) 
-setwd('/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22')
+setwd('/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22/outputs/T_test')
 
 #read in file
 group1=readRDS('outputs/ALT_violin.rds')%>%
@@ -16,13 +16,15 @@ group1=readRDS('outputs/ALT_violin.rds')%>%
 t.test(group1, group2, var.equal=TRUE)
 
 #read in file
-Sub=readRDS('mean_and_sd.rds')%>%
-  filter
-
-Notsub=
+Sub=readRDS('ep_early.rds')%>%
+  filter(Xlabel==1)
   
-t.test(Sub, Notsub, var.equal=TRUE)
 
+Notsub=readRDS('ep_early.rds')%>%
+  filter(Xlabel=='S')
+
+  
+EPe_S_0=t.test(Sub$ALT, Notsub$ALT, var.equal=TRUE)
 
 
 

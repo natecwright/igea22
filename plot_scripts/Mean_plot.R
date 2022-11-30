@@ -43,15 +43,17 @@ tp_late_df=do.call(rbind, lapply(tp_late, readRDS))
 saveRDS(tp_late_df, 'C:/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22/outputs/T_test/tp_late.rds')
 
 setwd('C:/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22/outputs/munged_12/')
-ep_early=list.files(pattern="ALT_violin_EP")
-tp_early=list.files(pattern="ALT_violin_TP")
+ep_early=list.files("EP_violin")
+tp_early=list.files("Tp_violin")
 
+setwd('C:/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22/outputs/munged_12/EP_violin/')
 ep_early_df=do.call(rbind, lapply(ep_early, readRDS))
 saveRDS(ep_early_df, 'C:/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22/outputs/T_test/ep_early.rds')
+setwd('C:/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22/outputs/munged_12/TP_violin/')
 tp_early_df=do.call(rbind, lapply(tp_early, readRDS))
 saveRDS(tp_early_df, 'C:/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22/outputs/T_test/tp_early.rds')
 
-#find the means
+#find the means and sds
 ep_early_mean=ep_early_df%>%
   group_by(Xlabel)%>%
   summarize(mean=mean(ALT, na.rm = TRUE), sd=sd(ALT, na.rm = TRUE))%>%
@@ -73,7 +75,8 @@ tp_late_mean=tp_late_df%>%
   mutate(Source='TP late')
 
 final_df=rbind(ep_early_mean,ep_late_mean,tp_early_mean,tp_late_mean)
-
+final_df=rbind(ep_early_mean,tp_early_mean)
+saveRDS(final_df, 'C:/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22/outputs/T_test/final.rds')
 #mean = Giant_df%>% 
 #  group_by(Xlabel)%>% 
 #  summarize(average = mean(ALT))%>%
