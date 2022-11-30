@@ -15,7 +15,13 @@ group1=readRDS('outputs/ALT_violin.rds')%>%
 
 t.test(group1, group2, var.equal=TRUE)
 
+#read in file
+Sub=readRDS('mean_and_sd.rds')%>%
+  filter
 
+Notsub=
+  
+t.test(Sub, Notsub, var.equal=TRUE)
 
 
 
