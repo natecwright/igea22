@@ -1,4 +1,4 @@
-#script for WS data analysis
+#script for group 1 and 2 WS data analysis
 #libraries and wd----
 library(dplyr)
 library(readxl)
@@ -6,6 +6,8 @@ library(tidyr)
 library(stringr)
 library(fuzzyjoin)
 library(gmt)
+library(rgdal)
+library(sf)
 
 setwd('/Users/Oskar/Documents/UMass/IGEA/igea22/')
 
@@ -55,8 +57,7 @@ metadata_df = read_xlsx('Raw_water_data/12metadata.xlsx')%>%
 
 our_df = left_join(WS1_avg_df,metadata_df,"Identifier_1")
 
-#join our data with NEON data----
-#read in NEON data
+#read in NEON data----
 ground_df = read_xlsx('Raw_water_data/NEON_ground_111622.xlsx')%>%
   select('Latitude','Longitude','Elevation_mabsl','Sample_ID','Collection_Date','d2H','d18O')%>%
   mutate(date_time=as.POSIXct(Collection_Date,tz="US/Alaska"))%>%
@@ -70,20 +71,34 @@ precip_df = read_xlsx('Raw_water_data/NEON_precipitation.xlsx',sheet=2, skip=1)%
 #filter for North Slope
 ground_NS_df = ground_df%>%
   filter(between(Latitude,68,69))%>%
-  mutate(Site_ID=case_when(Longitude >= -149.4~"TOOK",
-                           Longitude < -149.4~"OKSR"))
+  mutate(Site_ID=case_when(Longitude < -149.4~"TOOK",
+                           Longitude >= -149.4~"OKSR"))
 
 precip_NS_df = precip_df%>%
   filter(between(Latitude,68,69))
 
-#yet to try----
-#join by doy within 365, created weighted column (inverse of days_apart)
-by_time=difference_inner_join(our_df,precip_NS_df,by='doy',max_dist=365,distance_col='days_apart')%>%
-  mutate(weights=1/'doy')
-#weighted.mean within summarize
+#join by coordinates----
+LongLatToUTM<-function(x,y,zone){
+  xy <- data.frame(ID = 1:length(x), X = x, Y = y)
+  coordinates(xy) <- c("X", "Y")
+  proj4string(xy) <- CRS("+proj=longlat +datum=WGS84")
+  res <- spTransform(xy, CRS(paste("+proj=utm +zone=",zone," ellps=WGS84",sep='')))
+  res=st_as_sf(res)
+  return(data.frame(x=st_coordinates(res)[,1],y=st_coordinates(res)[,2]))}
 
-#join by coordinates -- geodist doen't accept UTM
-by_dist=geodist(our_df$Latitude, our_df$Longitude, precip_NS_df$Latitude, precip_NS_df$Longitude)
+ground_utm = ground_NS_df%>%
+  mutate(LongLatToUTM(Longitude,Latitude,6))
+  
+
+precip_utm = precip_NS_df%>%
+  mutate(LongLatToUTM(Longitude,Latitude,6))
+  
+by_time_precip=difference_left_join(our_df,precip_utm,by='doy',max_dist=365,distance_col='days_apart')
+
+by_dist_group=distance_left_join(our_df,ground_utm,by=c("x","y"),max_dist=1000,distance_col='meters_apart')
+
+#yet to try
+#join by doy within 365, created weighted column (inverse of days_apart), weighted.mean within summarize
 
 #yet to do----
 #calculate fraction resembling ground and precip for each sample for which a match is found
