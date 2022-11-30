@@ -1,4 +1,4 @@
-#script for WS data analysis
+#script for group 1 and 2 WS data analysis
 #libraries and wd----
 library(dplyr)
 library(readxl)
@@ -55,8 +55,7 @@ metadata_df = read_xlsx('Raw_water_data/12metadata.xlsx')%>%
   mutate(date_time=as.POSIXct(newdate,tz="US/Alaska"))%>%
   mutate(doy=as.numeric(strftime(date_time, format = "%j")))
 
-our_df = left_join(WS1_avg_df,metadata_df,"Identifier_1")%>%
-  mutate(utm=cbind(Longitude,Latitude))
+our_df = left_join(WS1_avg_df,metadata_df,"Identifier_1")
 
 #read in NEON data----
 ground_df = read_xlsx('Raw_water_data/NEON_ground_111622.xlsx')%>%
@@ -72,8 +71,8 @@ precip_df = read_xlsx('Raw_water_data/NEON_precipitation.xlsx',sheet=2, skip=1)%
 #filter for North Slope
 ground_NS_df = ground_df%>%
   filter(between(Latitude,68,69))%>%
-  mutate(Site_ID=case_when(Longitude >= -149.4~"TOOK",
-                           Longitude < -149.4~"OKSR"))
+  mutate(Site_ID=case_when(Longitude < -149.4~"TOOK",
+                           Longitude >= -149.4~"OKSR"))
 
 precip_NS_df = precip_df%>%
   filter(between(Latitude,68,69))
@@ -88,15 +87,15 @@ LongLatToUTM<-function(x,y,zone){
   return(data.frame(x=st_coordinates(res)[,1],y=st_coordinates(res)[,2]))}
 
 ground_utm = ground_NS_df%>%
-  mutate(utm=LongLatToUTM(Longitude,Latitude,6))
+  mutate(LongLatToUTM(Longitude,Latitude,6))
+  
 
 precip_utm = precip_NS_df%>%
-  mutate(utm=LongLatToUTM(Longitude,Latitude,6))
+  mutate(LongLatToUTM(Longitude,Latitude,6))
   
 by_time_precip=difference_left_join(our_df,precip_utm,by='doy',max_dist=365,distance_col='days_apart')
 
-#!
-by_dist_group=distance_left_join(our_df,ground_utm,by='utm',max_dist=1000,distance_col='meters_apart')
+by_dist_group=distance_left_join(our_df,ground_utm,by=c("x","y"),max_dist=1000,distance_col='meters_apart')
 
 #yet to try
 #join by doy within 365, created weighted column (inverse of days_apart), weighted.mean within summarize
