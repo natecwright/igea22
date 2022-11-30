@@ -9,7 +9,7 @@ setwd('/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge
 
 #read in file
 ep7_elev=readRDS('outputs/ALT.rds')#%>%
-  filter(LRW==W)
+  #filter(LRW==W)
 
 p2=ggplot(ep7_elev)+
   geom_point(aes(y=ElevationA, x=UID2, colour="blue"))+ #as.factor makes discreet colors for the points
