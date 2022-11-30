@@ -57,4 +57,12 @@ WS3_avg = WS3_norm%>%
   group_by(Identifier_1)%>%
   summarize(avgO=mean(normO),avgH=mean(normH))
 
-saveRDS(WS3_avg,'water_scripts/WS3_avg.rds')
+metadata3 = read_xlsx('Raw_water_data/3metadata.xlsx')%>%
+  mutate(newtime = sapply(strsplit(as.character(Sample_Time), " "),"[",2))%>%
+  mutate(newdate = paste(Date, newtime, sep = " "))%>%
+  mutate(date_time=as.POSIXct(newdate,tz="US/Alaska"))%>%
+  mutate(doy=as.numeric(strftime(date_time, format = "%j")))
+
+our3 = left_join(WS3_avg,metadata3,"Identifier_1")
+
+saveRDS(WS3_avg,'water_scripts/our3.rds')

@@ -48,10 +48,6 @@ WS1_avg_df = WS1_norm_df%>%
   group_by(Identifier_1)%>%
   summarize(avgO=mean(normO),avgH=mean(normH))
 
-#combining groups 1, 2, and 3
-WS3_avg=readRDS('water_scripts/WS3_avg.rds')
-WS_avg=rbind(WS1_avg_df,WS3_avg)
-
 #join averages with metadata
 metadata_df = read_xlsx('Raw_water_data/12metadata.xlsx')%>%
   mutate(newtime = sapply(strsplit(as.character(Sample_Time), " "),"[",2))%>%
@@ -59,7 +55,11 @@ metadata_df = read_xlsx('Raw_water_data/12metadata.xlsx')%>%
   mutate(date_time=as.POSIXct(newdate,tz="US/Alaska"))%>%
   mutate(doy=as.numeric(strftime(date_time, format = "%j")))
 
-our_df = left_join(WS_avg,metadata_df,"Identifier_1")
+our_df = left_join(WS1_avg_df,metadata_df,"Identifier_1")
+
+#combining groups 1, 2, and 3
+our3=readRDS('water_scripts/our3.rds')
+ours=rbind(WS1_avg_df,WS3_avg)
 
 #read in NEON data----
 ground_df = read_xlsx('Raw_water_data/NEON_ground_111622.xlsx')%>%
@@ -96,9 +96,12 @@ ground_utm = ground_NS_df%>%
 precip_utm = precip_NS_df%>%
   mutate(LongLatToUTM(Longitude,Latitude,6))
   
-by_time_precip=difference_left_join(our_df,precip_utm,by='doy',max_dist=365,distance_col='days_apart')
+by_time_precip=difference_left_join(our_df,precip_utm,by='doy',max_dist=365,distance_col='days_apart')%>%
+  mutate(w=1/days_apart)
 
-by_dist_group=distance_left_join(our_df,ground_utm,by=c("x","y"),max_dist=100000,distance_col='meters_apart')
+by_dist_ground=distance_left_join(our_df,ground_utm,by=c("x","y"),max_dist=100000,distance_col='meters_apart')%>%
+  group_by(Identifier_1)%>%
+  summarize(dist_ground=min(meters_apart))
 
 #yet to try
 #join by doy within 365, created weighted column (inverse of days_apart), weighted.mean within summarize
