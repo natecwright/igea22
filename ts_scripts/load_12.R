@@ -56,7 +56,8 @@ index1_2=grep("END SLOPE",raw1_text) #ts1 end of section
 ts1_hr_df= read.delim(input1_file,
                       header = TRUE, skip = index1_1, nrows= (index1_2-index1_1-2), dec = ".", sep = ',')%>%
   rename("PointID"="TgtID")%>%
-  rename("HR"="RefHt")
+  rename("HR"="RefHt")%>%
+  filter(PointID != '101')
 
 
 input2_file=paste0('raw_ts_data/group12/',reach_ID,'_ts2.txt')
@@ -67,7 +68,8 @@ index2_2=grep("END SLOPE",raw2_text) #ts2 end of section
 ts2_hr_df= read.delim(input2_file,
                       header = TRUE, skip = index2_1, nrows= (index2_2-index2_1-2), dec = ".", sep = ',')%>%
   rename("PointID"="TgtID")%>%
-  rename("HR"="RefHt")
+  rename("HR"="RefHt")%>%
+  filter(PointID != '101')
 
 #----
 
@@ -77,14 +79,20 @@ ts1_txt = read.delim(paste0('raw_ts_data/group12.n/',reach_ID,'_ts1.txt'),
   mutate(TS_code = "1")%>%
   mutate(Reach = ts1_reach$Reach)%>%
   mutate(PointID = as.double(PointID))%>%
+  filter(PointID != '101')%>%
+  filter(!is.na(PointID))%>%
   mutate(HR=ts1_hr_df$HR)
+  
 
 ts2_txt = read.delim(paste0('raw_ts_data/group12.n/',reach_ID,'_ts2.txt'),
                      skip = 1, header = TRUE, dec = ".", sep = ',')%>%
   mutate(TS_code = "2")%>%
   mutate(Reach = ts2_reach$Reach)%>%
   mutate(PointID = as.double(PointID))%>%
+  filter(PointID != '101')%>%
+  filter(!is.na(PointID))%>%
   mutate(HR=ts2_hr_df$HR)
+  
 
 # manual intervention to get rid of PT 101 which was being problematic
 ts1_txt = ts1_txt[2:nrow(ts1_txt),]
@@ -127,12 +135,12 @@ master_df = rbind(joined_df3, joined_df4)%>%
 
 # SEPARATE A's & P's  ----
 
-a_df = select(master_df, UID2, Cross.section, LRW, Type, Number, Elevation)%>%
+a_df = select(master_df, UID2, Cross.section, LRW, Type, Number, Elevation, newelev)%>%
   filter(Type == 'A')%>% 
   rename("Active" = "Type")%>% 
   rename("ElevationA" = "newelev")
 
-p_df = select(master_df, UID2, Cross.section, LRW, Type, Number, Elevation)%>%
+p_df = select(master_df, UID2, Cross.section, LRW, Type, Number, Elevation, newelev)%>%
   filter(Type == 'P')%>% 
   rename("Permafrost" = "Type")%>% 
   rename("ElevationP" = "newelev")
@@ -147,8 +155,8 @@ print(input_file)
 print((nrow(alt_df) - length(unique(alt_df$UID2)))/nrow(alt_df))
 
 # save the nice files
-saveRDS(master_df, paste0('outputs/munged_12/master_',reach_ID,'.rds'))
-saveRDS(alt_df, paste0('outputs/munged_12/ALT_',reach_ID,'.rds'))
+# saveRDS(master_df, paste0('outputs/munged_12/master_',reach_ID,'.rds'))
+# saveRDS(alt_df, paste0('outputs/munged_12/ALT_',reach_ID,'.rds'))
 
 
 
