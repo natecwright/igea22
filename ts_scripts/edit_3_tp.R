@@ -8,15 +8,15 @@ library(stringi)
 setwd('/Users/emmaboudreau/Documents/GitHub/igea22/')
 
 
-g3_files = list.files('outputs/munged_3/TPs/')
-#input_file = "ALT_TP06.rds"
+g3_files = list.files('outputs/munged_3/TPs')
+#input_file = "ALT_3TP06.rds"
 
 edit_function = function(input_file){
   
-  reach_ID = substring(toupper(strsplit(input_file, "_")[[1]][2]), 1, 4)
+reach_ID = substring(strsplit(input_file, "_")[[1]][2], 1, 5)
   
-  master = readRDS(paste0('outputs/munged_3/TPs/master_3',reach_ID,'.rds'))
-  alt_df = readRDS(paste0('outputs/munged_3/TPs/ALT_3',reach_ID,'.rds'))
+  master = readRDS(paste0('outputs/munged_3/TPs/master_',reach_ID,'.rds'))
+  alt_df = readRDS(paste0('outputs/munged_3/TPs/ALT_',reach_ID,'.rds'))
   
   
   # edit the data to exclude all submerged water points----
