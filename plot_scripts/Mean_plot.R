@@ -38,18 +38,18 @@ ep_late=list.files(pattern="ALT_violin_3EP")#chooses the correct files to plot
 tp_late=list.files(pattern="ALT_violin_3TP")
 
 ep_late_df=do.call(rbind, lapply(ep_late, readRDS))
-saveRDS(ep_late_df, 'ep_late.rds')
+saveRDS(ep_late_df, 'C:/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22/outputs/T_test/ep_late.rds')
 tp_late_df=do.call(rbind, lapply(tp_late, readRDS))
-saveRDS(tp_late_df, 'tp_late.rds')
+saveRDS(tp_late_df, 'C:/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22/outputs/T_test/tp_late.rds')
 
-setwd('C:/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22/outputs/munged_12/final/')
+setwd('C:/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22/outputs/munged_12/')
 ep_early=list.files(pattern="ALT_violin_EP")
 tp_early=list.files(pattern="ALT_violin_TP")
 
 ep_early_df=do.call(rbind, lapply(ep_early, readRDS))
-saveRDS(ep_early_df, 'ep_early.rds')
+saveRDS(ep_early_df, 'C:/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22/outputs/T_test/ep_early.rds')
 tp_early_df=do.call(rbind, lapply(tp_early, readRDS))
-saveRDS(tp_early_df, 'tp_early.rds')
+saveRDS(tp_early_df, 'C:/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22/outputs/T_test/tp_early.rds')
 
 #find the means
 ep_early_mean=ep_early_df%>%

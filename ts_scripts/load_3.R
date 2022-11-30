@@ -65,7 +65,7 @@ ts1_hr_df= read.delim(input1_file,
                           header = TRUE, skip = index1_1, nrows= (index1_2-index1_1-2), dec = ".", sep = ',')%>%
   rename("PointID"="TgtID")%>%
   rename("HR"="RefHt")%>%
-  filter(!PointID==101)
+  filter(PointID!=101)
 
 
 input2_file=paste0('raw_ts_data/group3/',reach_ID,'_ts2.txt')
@@ -77,7 +77,7 @@ ts2_hr_df= read.delim(input2_file,
                       header = TRUE, skip = index2_1, nrows= (index2_2-index2_1-2), dec = ".", sep = ',')%>%
   rename("PointID"="TgtID")%>%
   rename("HR"="RefHt")%>%
-  filter(!PointID==101)
+  filter(PointID!=101)
 
 
 
@@ -115,7 +115,8 @@ print(toupper(reach_ID))
 #row bind excel files for ts1 and ts2
 joined_df1 = rbind(ts1_excel,ts2_excel)%>%
   filter(Reach==reach_ID)%>%
-  filter(!is.na(XSection)) #remove PT 101
+  filter(!is.na(XSection)) %>% #remove PT 101
+  mutate(ERRORCODE=ifelse(is.na(ERRORCODE),0,ERRORCODE))
 
 #row bind txt files for ts1 and ts2
 joined_df2 = rbind(ts1_txt,ts2_txt)
@@ -133,12 +134,10 @@ master_df = left_join(joined_df1, joined_df2, by=c('Reach', 'TS_code', 'PointID'
   mutate(number = substr(uniqueID,11,11))%>%
   mutate(UID2 = paste0(Reach,TS_code,LWR,number,XSection))%>%
   mutate(Elevation = as.double(str_remove_all(Elevation, ' ')))%>%
-  filter(!PointID==101)%>%
-  mutate(newheight=ifelse(ERRORCODE==2,Elevation + (HR-ADJUSTMENT),Elevation)) #else statement not working
-  # if (ERRORCODE==is.na){
-  #   newheight==Elevation
-  # }
-  #filter(!ERRORCODE==8)   #being problematic and removin all of TS1
+  filter(PointID!=101)%>%
+  mutate(newelev=ifelse(ERRORCODE==2,Elevation + (HR-ADJUSTMENT),Elevation))%>% #adjustment for HR change if errorcode is 2
+  filter(ERRORCODE!="8") 
+  
 
   
   
@@ -147,17 +146,16 @@ master_df = left_join(joined_df1, joined_df2, by=c('Reach', 'TS_code', 'PointID'
 
 
 
-a_df = select(master_df, UID2, AP, LWR, Elevation)%>%
+a_df = select(master_df, UID2, AP, LWR, newelev)%>%
   filter(AP =='A')%>% 
   rename("Active" = "AP")%>% 
-  rename("ElevationA" = "Elevation")
+  rename("ElevationA" = "newelev")
 
 
-
-p_df = select(master_df, UID2, AP, LWR, Elevation)%>%
+p_df = select(master_df, UID2, AP, LWR, newelev)%>%
   filter(AP =='P')%>% 
   rename("Permafrost" = "AP")%>% 
-  rename("ElevationP" = "Elevation")
+  rename("ElevationP" = "newelev")
 
 
 
