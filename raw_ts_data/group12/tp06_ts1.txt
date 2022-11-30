@@ -107,9 +107,7 @@ THEODOLITE
                 STN_NO  260046851
                 STN_ID  "TS1"
                 INST_HT 1.504000;
-        END SETUP
         SLOPE (TgtNo, TgtID, CfgNo, Hz, Vz, SDist, RefHt, Date, Ppm, ApplType, Flags)
-        END SLOPE
         SETUP
                 STN_NO  260046852
                 STN_ID  "TS1"
