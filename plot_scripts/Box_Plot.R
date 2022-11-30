@@ -15,12 +15,12 @@ Mean_df=Giant_df%>%
   p3=ggplot(Giant_df,aes(y=ALT, x=Xlabel, colour=as.factor(Xlabel)))+
     geom_jitter()+#as.factor makes discreet colors for the points
     geom_boxplot(aes(fill=as.factor(Xlabel)), alpha = 0.5, colour="black")+
-    coord_cartesian(ylim=c(0,1))+
+    coord_cartesian(ylim=c(0,0.5))+
     stat_summary(fun = "mean",
                geom = "crossbar",
                width = 0.5,
                alpha=0.5)+
-    annotate(geom="text", x=Mean_df$Xlabel, y=1, label=paste('mu=',format(round(Mean_df$mean,2),nsmall=2)),
+    annotate(geom="text", x=Mean_df$Xlabel, y=0.5, label=paste('mu=',format(round(Mean_df$mean,2),nsmall=2)),
              color="black")+
     #stat_summary(fun = "mean",geom="text",label=mean_in_order,colour="black")+
     #scale_x_discrete(limits = c("S","0","1","2","3","4"))+#reorders the x-axis
