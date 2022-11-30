@@ -1,13 +1,13 @@
 #Create and batch violin plot----
 
-early_violin=function(giant_df){
+early_violin=function(Giant_df){
 library(dplyr)
 library(ggplot2)
 
 
   
 
-p3=ggplot(giant_df)+
+p3=ggplot(Giant_df)+
   geom_boxplot(aes(y=ALT, x=Xlabel, colour=as.factor(Xlabel)))+ #as.factor makes discreet colors for the points
   #geom_Violin(aes(y=ALT, x=cross.section, colour=as.factor(Cross.section)))+
   coord_cartesian(ylim=c(0,1))+
@@ -36,8 +36,8 @@ return(p3)
 
 #batch
 #rp3eads and plots all of the files in this folder
-setwd('C:/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22/outputs/munged_3/')
-file_list=list.files(pattern="ALT_violin_3EP")#chooses the correct files to plot
+setwd('C:/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22/outputs/munged_12/')
+file_list=list.files(pattern="ALT_violin_EP")#chooses the correct files to plot
 
 
 Giant_df=do.call(rbind, lapply(file_list, readRDS))
@@ -49,7 +49,7 @@ Giant_df=do.call(rbind, lapply(file_list, readRDS))
   Giant_df['Xlabel'][Giant_df['Xlabel'] == 'S'] <- 'Submerged in Water'
   #filter(ALT<0)
 
-Giant_df2=Giant_df[ which(!is.na(str_match(Giant_df$UID2,"EP7"))),]
+#Giant_df2=Giant_df[ which(!is.na(str_match(Giant_df$UID2,"EP7"))),]
 
 mean = Giant_df%>% 
   group_by(Xlabel)%>% 
