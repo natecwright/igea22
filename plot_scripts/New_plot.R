@@ -8,12 +8,14 @@ library(ggplot2)
 setwd('/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22/outputs/munged_12/EPs/')
 
 #read in file
-ep7_elev=readRDS('master_EP01.rds')#%>%
+ep_early=list.files("master")
+
+temp=readRDS('master_EP01.rds')#%>%
 #filter(LRW==W)
 
-p2=ggplot(ep7_elev)+
+p2=ggplot(temp)+
   geom_point(aes(y=ALT, x=Temperature(C), colour="blue"))+ #as.factor makes discreet colors for the points
-  filter(Type == '')+
+  filter(Type == 'S')+
   theme_bw()+ #gets rid of grey background
   xlab('UID2')+
   ylab('Active Layer Elevation(m)')+
