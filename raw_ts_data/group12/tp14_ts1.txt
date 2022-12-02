@@ -154,17 +154,13 @@ THEODOLITE
                 STN_NO  41943098
                 STN_ID  "TS1"
                 INST_HT 1.568000;
-        END SETUP
         SLOPE (TgtNo, TgtID, CfgNo, Hz, Vz, SDist, RefHt, Date, Ppm, ApplType, Flags)
                 41943100,       "101",  2,      17.381730,      95.010680,     0.000000,        2.030000,       14-04-2022/08:41:19.0,  0.000000,       107,   00001110;
-        END SLOPE
         SETUP
                 STN_NO  41943102
                 STN_ID  "TS1"
                 INST_HT 1.568000;
-        END SETUP
         SLOPE (TgtNo, TgtID, CfgNo, Hz, Vz, SDist, RefHt, Date, Ppm, ApplType, Flags)
-        END SLOPE
 END THEODOLITE
 
 HEADER
