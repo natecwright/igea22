@@ -110,10 +110,8 @@ THEODOLITE
                 STN_NO  226492419
                 STN_ID  "TS1"
                 INST_HT 1.400000;
-        END SETUP
         SLOPE (TgtNo, TgtID, CfgNo, Hz, Vz, SDist, RefHt, Date, Ppm, ApplType, Flags)
                 226492421,      "101",  1,      187.534680,     89.394810,     34.990100,       2.035000,       26-04-2022/09:29:36.0,  0.000000,       107,   00001110;
-        END SLOPE
         SETUP
                 STN_NO  226492424
                 STN_ID  "TS1"

@@ -8,9 +8,9 @@ library(stringi)
 setwd('C:/Users/ncw02/Downloads/IGEA/')
 
 g12_files = list.files('raw_ts_data/group12.n')
-input_file = "tp06_ts1.txt"
+#input_file = "tp10_ts1.txt"
 
-#read_function = function(input_file){
+read_function = function(input_file){
 
 reach_ID = strsplit(input_file, "_")[[1]][1]
 
@@ -58,7 +58,7 @@ ts1_hr_df= read.delim(input1_file,
   rename("PointID"="TgtID")%>%
   rename("HR"="RefHt")%>%
   filter(PointID != '101')
-
+  
 
 input2_file=paste0('raw_ts_data/group12/',reach_ID,'_ts2.txt')
 raw2_text=readLines(con=input2_file) #read every line
@@ -70,6 +70,7 @@ ts2_hr_df= read.delim(input2_file,
   rename("PointID"="TgtID")%>%
   rename("HR"="RefHt")%>%
   filter(PointID != '101')
+
 
 #----
 
@@ -150,21 +151,24 @@ alt_df = left_join(a_df, p_df, by=c('UID2','LRW', 'Number', 'Cross.section'))%>%
   mutate(ALT = (ElevationA-ElevationP))%>%
   filter(ALT > 0)
 
+
+# ----
+
 # printing the file and the percent of it that yields negative valueess
 print(input_file)
 print((nrow(alt_df) - length(unique(alt_df$UID2)))/nrow(alt_df))
 
 # save the nice files
-# saveRDS(master_df, paste0('outputs/munged_12/master_',reach_ID,'.rds'))
-# saveRDS(alt_df, paste0('outputs/munged_12/ALT_',reach_ID,'.rds'))
+saveRDS(master_df, paste0('outputs/munged_12/master_',reach_ID,'.rds'))
+saveRDS(alt_df, paste0('outputs/munged_12/ALT_',reach_ID,'.rds'))
 
 
 
-#}
+}
 
 
-#lapply(g12_files,read_function)
+lapply(g12_files,read_function)
 
-# ----
+
 
 
