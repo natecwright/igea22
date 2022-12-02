@@ -8,9 +8,9 @@ library(stringi)
 setwd('C:/Users/ncw02/Downloads/IGEA/')
 
 g12_files = list.files('raw_ts_data/group12.n')
-#input_file = "tp10_ts1.txt"
+input_file = "tp10_ts1.txt"
 
-read_function = function(input_file){
+#read_function = function(input_file){
 
 reach_ID = strsplit(input_file, "_")[[1]][1]
 
@@ -106,7 +106,7 @@ ts2_txt = ts2_txt[2:nrow(ts2_txt),]
 # JOIN DATA FRAMES ----
 reach_ID = toupper(reach_ID)
 
-# this joins excel (digitized data) with metadata for ts1
+# this joins excel (digitized data) with metadata for ts2
 joined_df1 = left_join(ts1_excel, metadata_excel, by='Reach')%>%
   filter(Reach == reach_ID)
 
@@ -115,7 +115,9 @@ joined_df2 = left_join(ts2_excel, metadata_excel, by='Reach')%>%
   filter(Reach == reach_ID)
 
 # this joins the previous file with txt file data 
-joined_df3 = left_join(joined_df1, ts1_txt, by=c('Reach','PointID','TS_code'))
+joined_df3 = left_join(joined_df1, ts1_txt, by=c('Reach','PointID','TS_code'))%>%
+  mutate(ERRORCODE=ifelse(is.na(ERRORCODE),0,ERRORCODE))
+
 joined_df4 = left_join(joined_df2, ts2_txt, by=c('Reach','PointID','TS_code'))%>%
   mutate(ERRORCODE=ifelse(is.na(ERRORCODE),0,ERRORCODE))
 
@@ -164,10 +166,10 @@ saveRDS(alt_df, paste0('outputs/munged_12/ALT_',reach_ID,'.rds'))
 
 
 
-}
+#}
 
 
-lapply(g12_files,read_function)
+#lapply(g12_files,read_function)
 
 
 
