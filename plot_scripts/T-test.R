@@ -1,4 +1,4 @@
-#CRun a T test----
+#Run a T test----
 
 library(dplyr)
 library(readxl)
@@ -7,22 +7,19 @@ library(readxl)
 #library(rstatix)
 
 #setwd(path to data) 
-setwd('/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22')
+setwd('/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22/outputs/T_test')
+
 
 #read in file
-group1=readRDS('outputs/ALT_violin.rds')%>%
-  Filter(Xlabel=1)
+Sub=readRDS('ep_early.rds')%>%
+  filter(Xlabel==1 | Xlabel==2 | Xlabel==3 | Xlabel==4) #data set 1 to be compared in t test
+  #filter(Xlabel==1)
 
-t.test(group1, group2, var.equal=TRUE)
 
-#read in file
-Sub=readRDS('mean_and_sd.rds')%>%
-  filter
-
-Notsub=
+Notsub=readRDS('ep_early.rds')%>%
+  filter(Xlabel=='S') #data set 2 to be compared
   
-t.test(Sub, Notsub, var.equal=TRUE)
-
+EPe_S_all=t.test(Sub$ALT, Notsub$ALT, var.equal=TRUE) #t test for the alt columns of two sets of data to be compared
 
 
 

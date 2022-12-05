@@ -8,7 +8,7 @@ library(stringi)
 setwd('C:/Users/ncw02/Downloads/IGEA/')
 
 g12_files = list.files('raw_ts_data/group12.n')
-input_file = "tp06_ts1.txt"
+input_file = "tp10_ts1.txt"
 
 #read_function = function(input_file){
 
@@ -56,8 +56,9 @@ index1_2=grep("END SLOPE",raw1_text) #ts1 end of section
 ts1_hr_df= read.delim(input1_file,
                       header = TRUE, skip = index1_1, nrows= (index1_2-index1_1-2), dec = ".", sep = ',')%>%
   rename("PointID"="TgtID")%>%
-  rename("HR"="RefHt")
-
+  rename("HR"="RefHt")%>%
+  filter(PointID != '101')
+  
 
 input2_file=paste0('raw_ts_data/group12/',reach_ID,'_ts2.txt')
 raw2_text=readLines(con=input2_file) #read every line
@@ -67,7 +68,9 @@ index2_2=grep("END SLOPE",raw2_text) #ts2 end of section
 ts2_hr_df= read.delim(input2_file,
                       header = TRUE, skip = index2_1, nrows= (index2_2-index2_1-2), dec = ".", sep = ',')%>%
   rename("PointID"="TgtID")%>%
-  rename("HR"="RefHt")
+  rename("HR"="RefHt")%>%
+  filter(PointID != '101')
+
 
 #----
 
@@ -77,14 +80,20 @@ ts1_txt = read.delim(paste0('raw_ts_data/group12.n/',reach_ID,'_ts1.txt'),
   mutate(TS_code = "1")%>%
   mutate(Reach = ts1_reach$Reach)%>%
   mutate(PointID = as.double(PointID))%>%
+  filter(PointID != '101')%>%
+  filter(!is.na(PointID))%>%
   mutate(HR=ts1_hr_df$HR)
+  
 
 ts2_txt = read.delim(paste0('raw_ts_data/group12.n/',reach_ID,'_ts2.txt'),
                      skip = 1, header = TRUE, dec = ".", sep = ',')%>%
   mutate(TS_code = "2")%>%
   mutate(Reach = ts2_reach$Reach)%>%
   mutate(PointID = as.double(PointID))%>%
+  filter(PointID != '101')%>%
+  filter(!is.na(PointID))%>%
   mutate(HR=ts2_hr_df$HR)
+  
 
 # manual intervention to get rid of PT 101 which was being problematic
 ts1_txt = ts1_txt[2:nrow(ts1_txt),]
@@ -97,7 +106,7 @@ ts2_txt = ts2_txt[2:nrow(ts2_txt),]
 # JOIN DATA FRAMES ----
 reach_ID = toupper(reach_ID)
 
-# this joins excel (digitized data) with metadata for ts1
+# this joins excel (digitized data) with metadata for ts2
 joined_df1 = left_join(ts1_excel, metadata_excel, by='Reach')%>%
   filter(Reach == reach_ID)
 
@@ -106,7 +115,9 @@ joined_df2 = left_join(ts2_excel, metadata_excel, by='Reach')%>%
   filter(Reach == reach_ID)
 
 # this joins the previous file with txt file data 
-joined_df3 = left_join(joined_df1, ts1_txt, by=c('Reach','PointID','TS_code'))
+joined_df3 = left_join(joined_df1, ts1_txt, by=c('Reach','PointID','TS_code'))%>%
+  mutate(ERRORCODE=ifelse(is.na(ERRORCODE),0,ERRORCODE))
+
 joined_df4 = left_join(joined_df2, ts2_txt, by=c('Reach','PointID','TS_code'))%>%
   mutate(ERRORCODE=ifelse(is.na(ERRORCODE),0,ERRORCODE))
 
@@ -127,12 +138,12 @@ master_df = rbind(joined_df3, joined_df4)%>%
 
 # SEPARATE A's & P's  ----
 
-a_df = select(master_df, UID2, Cross.section, LRW, Type, Number, Elevation)%>%
+a_df = select(master_df, UID2, Cross.section, LRW, Type, Number, Elevation, newelev)%>%
   filter(Type == 'A')%>% 
   rename("Active" = "Type")%>% 
   rename("ElevationA" = "newelev")
 
-p_df = select(master_df, UID2, Cross.section, LRW, Type, Number, Elevation)%>%
+p_df = select(master_df, UID2, Cross.section, LRW, Type, Number, Elevation, newelev)%>%
   filter(Type == 'P')%>% 
   rename("Permafrost" = "Type")%>% 
   rename("ElevationP" = "newelev")
@@ -141,6 +152,9 @@ p_df = select(master_df, UID2, Cross.section, LRW, Type, Number, Elevation)%>%
 alt_df = left_join(a_df, p_df, by=c('UID2','LRW', 'Number', 'Cross.section'))%>%
   mutate(ALT = (ElevationA-ElevationP))%>%
   filter(ALT > 0)
+
+
+# ----
 
 # printing the file and the percent of it that yields negative valueess
 print(input_file)
@@ -157,6 +171,6 @@ saveRDS(alt_df, paste0('outputs/munged_12/ALT_',reach_ID,'.rds'))
 
 #lapply(g12_files,read_function)
 
-# ----
+
 
 

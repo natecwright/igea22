@@ -45,7 +45,7 @@ return(p3)
 }
 
 #batch
-#rp3eads and plots all of the files in this folder
+#reads and plots all of the files in this folder
 setwd('C:/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22/outputs/munged_12/EP_violin/')
 file_list=list.files(pattern="ALT_violin_EP")#chooses the correct files to plot
 
