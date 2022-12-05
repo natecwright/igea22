@@ -59,21 +59,25 @@ our_df = left_join(WS1_avg_df,metadata_df,"Identifier_1")
 
 #combining groups 1, 2, and 3----
 our3=readRDS('water_scripts/our3.rds')
-ours=rbind(WS1_avg_df,WS3_avg)
+ours=rbind(our_df,our3)
 #group 3 identifiers have an underscore before the number
 
 #read in NEON data----
 ground_df = read_xlsx('Raw_water_data/NEON_ground_111622.xlsx')%>%
   select('Latitude','Longitude','Elevation_mabsl','Sample_ID','Collection_Date','d2H','d18O')%>%
   mutate(date_time=as.POSIXct(Collection_Date,tz="US/Alaska"))%>%
-  mutate(doy=as.numeric(strftime(date_time, format = "%j")))
+  mutate(doy=as.numeric(strftime(date_time, format = "%j")))%>%
+  mutate(d2H=as.numeric(d2H))%>%
+  mutate(d18O=as.numeric(d18O))
 
 precip_df = read_xlsx('Raw_water_data/NEON_precipitation.xlsx',sheet=2, skip=1)%>%
   select('Latitude','Longitude','Elevation_mabsl','Sample_ID','Collection_Date','d2H','d18O')%>%
   mutate(date_time=as.POSIXct(Collection_Date,tz="US/Alaska"))%>%
-  mutate(doy=as.numeric(strftime(date_time, format = "%j")))
+  mutate(doy=as.numeric(strftime(date_time, format = "%j")))%>%
+  mutate(d2H=as.numeric(d2H))%>%
+  mutate(d18O=as.numeric(d18O))
 
-#filter for North Slope
+#filter for North Slope----
 ground_NS_df = ground_df%>%
   filter(between(Latitude,68,69))%>%
   mutate(Site_ID=case_when(Longitude < -149.4~"TOOK",
@@ -82,7 +86,7 @@ ground_NS_df = ground_df%>%
 precip_NS_df = precip_df%>%
   filter(between(Latitude,68,69))
 
-#join by coordinates----
+#convert into utm----
 LongLatToUTM<-function(x,y,zone){
   xy <- data.frame(ID = 1:length(x), X = x, Y = y)
   coordinates(xy) <- c("X", "Y")
@@ -97,10 +101,13 @@ ground_utm = ground_NS_df%>%
 precip_utm = precip_NS_df%>%
   mutate(LongLatToUTM(Longitude,Latitude,6))
   
-by_time_precip=difference_left_join(our_df,precip_utm,by='doy',max_dist=365,distance_col='days_apart')%>%
-  mutate(w=1/days_apart)
+#join by closest times and coordinates----
+by_time_precip=difference_left_join(ours,precip_utm,by='doy',max_dist=365,distance_col='days_apart')%>%
+  mutate(w=1/days_apart)%>%
+  group_by(Identifier_1)%>%
+  summarize(ourO=first(avgO),ourH=first(avgH),precipH=weighted.mean(d2H,w),precipO=weighted.mean(d18O,w))
 
-by_dist_ground=distance_left_join(our_df,ground_utm,by=c("x","y"),max_dist=100000,distance_col='meters_apart')%>%
+by_dist_ground=distance_left_join(ours,ground_utm,by=c("x","y"),max_dist=100000,distance_col='meters_apart')%>%
   group_by(Identifier_1)%>%
   summarize(dist_ground=min(meters_apart))
 

@@ -84,4 +84,4 @@ metadata3 = read_xlsx('Raw_water_data/3metadata.xlsx')%>%
 
 our3 = left_join(WS3_avg,metadata3,"Identifier_1")
 
-saveRDS(WS3_avg,'water_scripts/our3.rds')
+saveRDS(our3,'water_scripts/our3.rds')
