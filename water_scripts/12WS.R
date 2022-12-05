@@ -57,9 +57,10 @@ metadata_df = read_xlsx('Raw_water_data/12metadata.xlsx')%>%
 
 our_df = left_join(WS1_avg_df,metadata_df,"Identifier_1")
 
-#combining groups 1, 2, and 3
+#combining groups 1, 2, and 3----
 our3=readRDS('water_scripts/our3.rds')
 ours=rbind(WS1_avg_df,WS3_avg)
+#group 3 identifiers have an underscore before the number
 
 #read in NEON data----
 ground_df = read_xlsx('Raw_water_data/NEON_ground_111622.xlsx')%>%
