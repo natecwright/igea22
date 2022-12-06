@@ -107,6 +107,9 @@ by_time_precip=difference_left_join(ours,precip_utm,by='doy',max_dist=365,distan
   group_by(Identifier_1)%>%
   summarize(ourO=first(avgO),ourH=first(avgH),precipH=weighted.mean(d2H,w),precipO=weighted.mean(d18O,w))
 
+#why does this not work?
+case_when(is.na(by_time_precip$precipH) ~ precip_utm[4,'d2H'])
+
 by_dist_ground=distance_left_join(ours,ground_utm,by=c("x","y"),max_dist=100000,distance_col='meters_apart')%>%
   group_by(Identifier_1)%>%
   summarize(dist_ground=min(meters_apart))
