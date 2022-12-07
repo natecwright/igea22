@@ -8,7 +8,7 @@ library(stringi)
 setwd('/Users/emmaboudreau/Documents/GitHub/igea22/')
 
 
-g3_files = list.files('outputs/munged_3/TPs')
+g3_files = list.files('outputs/munged_3/TPs/')
 #input_file = "ALT_3TP06.rds"
 
 edit_function = function(input_file){
@@ -59,6 +59,6 @@ reach_ID = substring(strsplit(input_file, "_")[[1]][2], 1, 5)
   
 }
 
-dummy = lapply(g3_files,edit_function)
+lapply(g3_files,edit_function)
 
 
