@@ -101,36 +101,61 @@ ground_utm = ground_NS_df%>%
 precip_utm = precip_NS_df%>%
   mutate(LongLatToUTM(Longitude,Latitude,6))
   
-#join by closest times and coordinates----
-by_time_precip=difference_left_join(ours,precip_utm,by='doy',max_dist=365,distance_col='days_apart')%>%
+#join to NEON's precipitation data by closest times and coordinates----
+by_time_precip=difference_left_join(ours,precip_utm,by='doy',max_dist=365,distance_col='days_apart')
+
+near_t_precip=by_time_precip%>%
+  group_by(Identifier_1)%>%
+  filter(days_apart==min(days_apart))
+
+inv_t_precip=by_time_precip%>%
   mutate(w=1/days_apart)%>%
   group_by(Identifier_1)%>%
-  summarize(ourO=first(avgO),ourH=first(avgH),precipH=weighted.mean(d2H,w),precipO=weighted.mean(d18O,w))
+  summarize(precipH=weighted.mean(d2H,w),precipO=weighted.mean(d18O,w))
 
 #fix NaN due to ours and Neon's taken on the same day
-by_time_precip$precipH[is.na(by_time_precip$precipH)]=-146.4834
-by_time_precip$precipO[is.na(by_time_precip$precipO)]=-18.47599
+inv_t_precip$precipH[is.na(inv_t_precip$precipH)]=-146.4834
+inv_t_precip$precipO[is.na(inv_t_precip$precipO)]=-18.47599
 
-ground_OKSR=ground_utm%>%
-  filter(Site_ID=='OKSR')
-
-by_dist_ground=distance_left_join(ours,ground_OKSR,by=c("x","y"),max_dist=100000,distance_col='meters_apart')%>%
-  group_by(Identifier_1)%>%
-  summarize(meters_apart=mean(meters_apart))
+#join to NEON's ground data by closest times and coordinates----
+by_dist_ground=distance_left_join(ours,ground_utm,by=c("x","y"),max_dist=100000,distance_col='meters_apart')
 
 bdg_vis=by_dist_ground%>%
   select('Identifier_1','Sample_ID','meters_apart')
 
-#need help to create column from scratch
-#ours=ours%>%
-  #mutate(dist_separator=)
+ground_OKSR=ground_utm%>%
+  filter(Site_ID=='OKSR')
 
-bdg_fin=by_dist_ground%>%
+bdg_OKSR=distance_left_join(ours,ground_OKSR,by=c("x","y"),max_dist=100000,distance_col='meters_apart')%>%
   group_by(Identifier_1)%>%
-  summarize(dist_ground=min(meters_apart))
+  summarize(meters_to_ground=mean(meters_apart))
+
+btg_OKSR=difference_left_join(ours,ground_OKSR,by='doy',max_dist=365,distance_col='days_apart')%>%
+  mutate(w=1/days_apart)%>%
+  group_by(Identifier_1)%>%
+  summarize(ourO=first(avgO),ourH=first(avgH),groundH=weighted.mean(d2H,w),groundO=weighted.mean(d18O,w))
+
+#fix NaN due to ours and Neon's taken on the same day
+g_OKSR_avgs=ground_OKSR%>%
+  filter(doy==229|doy==230)%>%
+  group_by(doy)%>%
+  summarize(g_H_avg=mean(d2H),g_O_avg=mean(d18O))
+
+btg_OKSR$groundH[15]=g_OKSR_avgs$g_H_avg[1]
+btg_OKSR$groundO[15]=g_OKSR_avgs$g_O_avg[1]
+btg_OKSR$groundH[28]=g_OKSR_avgs$g_H_avg[2]
+btg_OKSR$groundO[28]=g_OKSR_avgs$g_O_avg[2]
+
+#putting it all together----
+g_from_OKSR=left_join(btg_OKSR,bdg_OKSR,by='Identifier_1')
+
+from_OKSR=left_join(g_from_OKSR,inv_t_precip,by='Identifier_1')
+
+final_OKSR=from_OKSR%>%
+  mutate(fO_precip=(groundO-ourO)/(groundO-precipO))%>%
+  mutate(fO_ground=(ourO-precipO)/(groundO-precipO))%>%
+  mutate(fH_precip=(groundH-ourH)/(groundH-precipH))%>%
+  mutate(fH_ground=(ourH-precipH)/(groundH-precipH))
 
 #yet to try
 #join by doy within 365, created weighted column (inverse of days_apart), weighted.mean within summarize
-
-#yet to do----
-#calculate fraction resembling ground and precip for each sample for which a match is found
