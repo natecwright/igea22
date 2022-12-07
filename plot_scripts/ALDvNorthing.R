@@ -8,24 +8,25 @@ library(ggplot2)
 setwd('/Users/emmaboudreau/Documents/GitHub/igea22/outputs/munged_3/')
 
 
-g3_files = list.files('EPs/')[1]
-reach_ID = substring(strsplit(g3_files, "_")[[1]][2], 1, 5)
+master_ep = list.files('EPs/master/')
+ALT_ep = list.files('EPs/ALT/')
 
-master_df = readRDS(paste0('EPs/master_',reach_ID,'.rds'))
-alt_df =  readRDS(paste0('EPs/ALT_',reach_ID,'.rds'))
+readRDS('EPs/master/master_3EP01.rds')
 
-all_df=do.call(rbind,lapply(g3_files,readRDS))
-# new_df = alt_df%>%
-#   mutate(Northing = master_df$North)
+master_df=do.call(rbind,lapply(paste0('EPs/master/',master_ep),readRDS))
+saveRDS(master_df, '/Users/emmaboudreau/Documents/GitHub/igea22/outputs/munged_3/EP_master/EP_master.rds')
+ALT_df=do.call(rbind,lapply(paste0('EPs/ALT/',ALT_ep),readRDS))
+saveRDS(ALT_df, '/Users/emmaboudreau/Documents/GitHub/igea22/outputs/munged_3/EP_ALT/EP_ALT.rds')
 
-new_df_df = cbind(alt_df,master_df[c(North)]
-
+ALT_mean=ALT_df%>%
+  mutate(Xlabel = 
+  group_by(Xlabel)%>%
+  summarize(mean=mean(ALT, na.rm = TRUE))
 
 #function will start here
 #NvsALT= function(input_df){
 
-library(dplyr)
-library(ggplot2)
+
 
 p3=ggplot(input_df,aes(y=ALT, x=ElevationA))+
   #geom_point()+

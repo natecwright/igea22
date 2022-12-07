@@ -10,18 +10,18 @@ setwd('/Users/emmaboudreau/Documents/GitHub/igea22/')
 
 
 
-g3_files = list.files('outputs/munged_3/EPs/')
-#input_file = "ALT_3EP01.rds"
+#g3_files = list.files('outputs/munged_3/EPs/')
+input_file = "ALT_3EP01.rds"
 
 
-edit_function = function(input_file) {
+#edit_function = function(input_file) {
   
   reach_ID = substring(strsplit(input_file, "_")[[1]][2], 1, 5)
   
 
   
-  master = readRDS(paste0('outputs/munged_3/EPs/master_',reach_ID,'.rds'))
-  alt_df = readRDS(paste0('outputs/munged_3/EPs/ALT_',reach_ID,'.rds'))
+  master = readRDS(paste0('outputs/munged_3/EPs/master/master_',reach_ID,'.rds'))
+  alt_df = readRDS(paste0('outputs/munged_3/EPs/ALT/ALT_',reach_ID,'.rds'))
   
   
   # edit the data to exclude all submerged water points----
@@ -34,23 +34,17 @@ edit_function = function(input_file) {
     
     
   tundra_points = alt_df%>%
-    mutate(number= substr(UID2,8,8))%>%
-    mutate(XSection= substr(UID2,9,9))%>%
     filter(LWR != 'W')%>%
     mutate(Xlabel = number)
   
   temp = alt_df%>%
     filter(LWR == 'W')%>%
-    mutate(number= substr(UID2,8,8))%>%
-    mutate(XSection= substr(UID2,9,9))%>%
     filter(XSection != '3')%>%
     filter(XSection != '8')%>%
      filter(number != '2')%>%
     filter(number != '4')
   
   temp2 = alt_df%>%
-    mutate(number= substr(UID2,8,8))%>%
-    mutate(XSection= substr(UID2,9,9))%>%
     filter(LWR == 'W')%>%
     filter(XSection == '3' | XSection == '8')%>%
     filter(number != '2')%>%
@@ -70,11 +64,11 @@ edit_function = function(input_file) {
   
   # ----
   ALT_violin = rbind(land_points, submerged_points)
-  saveRDS(ALT_violin, paste0('outputs/munged_3/EP_violin/ALT_violin_',reach_ID,'.rds'))
+  #saveRDS(ALT_violin, paste0('outputs/munged_3/EP_violin/ALT_violin_',reach_ID,'.rds'))
   
-}
+#}
 
-lapply(g3_files,edit_function)
+#lapply(g3_files,edit_function)
 
 
 
