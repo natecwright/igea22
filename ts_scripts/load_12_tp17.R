@@ -19,12 +19,12 @@ reach_ID = strsplit(input_file, "_")[[1]][1]
 ts1_excel = read_xlsx('raw_ts_data/fd/fd12_ts1.xlsx')%>%
   mutate(TS_code  = "1")%>% 
   rename("Notebook.notes" = "Notes")%>%
-  filter(is.na(ERRORCODE))
+  filter(is.na(ERRORCODE) | ERRORCODE ==2 | ERRORCODE ==1 | ERRORCODE ==5 | ERRORCODE ==3)
 
 ts2_excel = read_xlsx('raw_ts_data/fd/fd12_ts2.xlsx')%>%
   mutate(TS_code  = "2")%>% 
   rename("Notebook.notes" = "Notes")%>%
-  filter(is.na(ERRORCODE))
+  filter(is.na(ERRORCODE) | ERRORCODE ==2 | ERRORCODE ==1 | ERRORCODE ==5 | ERRORCODE ==3)
 
 names(ts1_excel) = make.names(names(ts1_excel), unique = TRUE)
 names(ts2_excel) = make.names(names(ts2_excel), unique = TRUE)

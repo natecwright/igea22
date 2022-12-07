@@ -8,9 +8,9 @@ library(stringi)
 setwd('C:/Users/ncw02/Downloads/IGEA/')
 
 g12_files = list.files('raw_ts_data/group12.n')
-input_file = "tp10_ts1.txt"
+#input_file = "tp05_ts1.txt"
 
-#read_function = function(input_file){
+read_function = function(input_file){
 
 reach_ID = strsplit(input_file, "_")[[1]][1]
 
@@ -20,12 +20,12 @@ reach_ID = strsplit(input_file, "_")[[1]][1]
 ts1_excel = read_xlsx('raw_ts_data/fd/fd12_ts1.xlsx')%>%
   mutate(TS_code  = "1")%>% 
   rename("Notebook.notes" = "Notes")%>%
-  filter(is.na(ERRORCODE))
+  filter(is.na(ERRORCODE) | ERRORCODE ==2 | ERRORCODE ==1 | ERRORCODE ==5 | ERRORCODE ==3)
 
 ts2_excel = read_xlsx('raw_ts_data/fd/fd12_ts2.xlsx')%>%
   mutate(TS_code  = "2")%>% 
   rename("Notebook.notes" = "Notes")%>%
-  filter(is.na(ERRORCODE))
+  filter(is.na(ERRORCODE) | ERRORCODE ==2 | ERRORCODE ==1 | ERRORCODE ==5 | ERRORCODE ==3)
 
 names(ts1_excel) = make.names(names(ts1_excel), unique = TRUE)
 names(ts2_excel) = make.names(names(ts2_excel), unique = TRUE)
@@ -166,10 +166,10 @@ saveRDS(alt_df, paste0('outputs/munged_12/ALT_',reach_ID,'.rds'))
 
 
 
-#}
+}
 
 
-#lapply(g12_files,read_function)
+lapply(g12_files,read_function)
 
 
 
