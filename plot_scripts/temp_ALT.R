@@ -18,7 +18,8 @@ file2=do.call(rbind, lapply(ep_early, readRDS))#file with temp
 
 
 new_df = left_join(file1,file2, by = 'UID2')%>%#join temp and xlabel
-  filter(Xlabel=='S')
+  filter(Xlabel=='S')%>%
+  mutate(Temperature(C) = Temperature)
 
 temp_xlabel=function(new_df){
   

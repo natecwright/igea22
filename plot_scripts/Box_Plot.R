@@ -15,12 +15,12 @@ Mean_df=Giant_df%>%
   p3=ggplot(Giant_df,aes(y=ALT, x=Xlabel, colour=as.factor(Xlabel)))+
     geom_jitter()+#as.factor makes discreet colors for the points
     geom_boxplot(aes(fill=as.factor(Xlabel)), alpha = 0.5, colour="black")+
-    coord_cartesian(ylim=c(0,0.5))+
+    coord_cartesian(ylim=c(0,1))+
     stat_summary(fun = "mean",
                geom = "crossbar",
                width = 0.5,
                alpha=0.5)+
-    annotate(geom="text", x=Mean_df$Xlabel, y=0.5, label=paste('mu=',format(round(Mean_df$mean,2),nsmall=2)),
+    annotate(geom="text", x=Mean_df$Xlabel, y=1, label=paste('mu=',format(round(Mean_df$mean,2),nsmall=2)),
              color="black")+
     #stat_summary(fun = "mean",geom="text",label=mean_in_order,colour="black")+
     #scale_x_discrete(limits = c("S","0","1","2","3","4"))+#reorders the x-axis
@@ -29,7 +29,7 @@ Mean_df=Giant_df%>%
   theme_bw()+ #gets rid of grey background
   xlab('Distance from Bank(m)')+
   ylab('Active Layer Thickness(m)')+
-  labs(title = "Active Layer Thickness of Early Season Elliptical Pools")+
+  labs(title = "Active Layer Thickness of Late Season Elliptical Pools")+#CHANGE ME
   labs(colour = 'LRW')+ #title of the legend
   theme(legend.text=element_text(size=14),
         legend.title=element_text(size=14),
@@ -46,8 +46,8 @@ return(p3)
 
 #batch
 #reads and plots all of the files in this folder
-setwd('C:/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22/outputs/munged_12/EP_violin/')
-file_list=list.files(pattern="ALT_violin_EP")#chooses the correct files to plot
+setwd('C:/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22/outputs/munged_3/EP_violin/') #CHANGE ME
+file_list=list.files(pattern="ALT_violin") #chooses the correct files to plot
 
 
 Giant_df=do.call(rbind, lapply(file_list, readRDS))
