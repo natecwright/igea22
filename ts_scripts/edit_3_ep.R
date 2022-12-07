@@ -25,7 +25,14 @@ edit_function = function(input_file) {
   
   
   # edit the data to exclude all submerged water points----
-  
+  alt_df = alt_df%>%
+    mutate(number= substr(UID2,8,8))%>%
+    mutate(XSection= substr(UID2,9,9))%>%
+    mutate(Xlabel = number)
+    
+    
+    
+    
   tundra_points = alt_df%>%
     mutate(number= substr(UID2,8,8))%>%
     mutate(XSection= substr(UID2,9,9))%>%
@@ -63,7 +70,7 @@ edit_function = function(input_file) {
   
   # ----
   ALT_violin = rbind(land_points, submerged_points)
-  saveRDS(ultimate, paste0('outputs/munged_3/EP_violin/ALT_violin_',reach_ID,'.rds'))
+  saveRDS(ALT_violin, paste0('outputs/munged_3/EP_violin/ALT_violin_',reach_ID,'.rds'))
   
 }
 
