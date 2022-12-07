@@ -107,10 +107,25 @@ by_time_precip=difference_left_join(ours,precip_utm,by='doy',max_dist=365,distan
   group_by(Identifier_1)%>%
   summarize(ourO=first(avgO),ourH=first(avgH),precipH=weighted.mean(d2H,w),precipO=weighted.mean(d18O,w))
 
-#why does this not work?
-case_when(is.na(by_time_precip$precipH) ~ precip_utm[4,'d2H'])
+#fix NaN due to ours and Neon's taken on the same day
+by_time_precip$precipH[is.na(by_time_precip$precipH)]=-146.4834
+by_time_precip$precipO[is.na(by_time_precip$precipO)]=-18.47599
 
-by_dist_ground=distance_left_join(ours,ground_utm,by=c("x","y"),max_dist=100000,distance_col='meters_apart')%>%
+ground_OKSR=ground_utm%>%
+  filter(Site_ID=='OKSR')
+
+by_dist_ground=distance_left_join(ours,ground_OKSR,by=c("x","y"),max_dist=100000,distance_col='meters_apart')%>%
+  group_by(Identifier_1)%>%
+  summarize(meters_apart=mean(meters_apart))
+
+bdg_vis=by_dist_ground%>%
+  select('Identifier_1','Sample_ID','meters_apart')
+
+#need help to create column from scratch
+#ours=ours%>%
+  #mutate(dist_separator=)
+
+bdg_fin=by_dist_ground%>%
   group_by(Identifier_1)%>%
   summarize(dist_ground=min(meters_apart))
 
