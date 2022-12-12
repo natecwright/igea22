@@ -9,14 +9,15 @@ setwd('C:/Users/ncw02/Downloads/IGEA/')
 
 
 g12_files = list.files('outputs/munged_12/EPs/')
-#input_file = "ALT_EP12.rds"
+input_file = "ALT_EP12.rds"
 
-edit_function = function(input_file){
+#edit_function = function(input_file){
 
 reach_ID = substring(toupper(strsplit(input_file, "_")[[1]][2]), 1, 4)
 
 master = readRDS(paste0('outputs/munged_12/EPs/master_',reach_ID,'.rds'))
-alt_df = readRDS(paste0('outputs/munged_12/EPs/ALT_',reach_ID,'.rds'))
+alt_df = readRDS(paste0('outputs/munged_12/EPs/ALT_',reach_ID,'.rds'))%>%
+  filter(ALT > 0)
 
 
 # edit the data to exclude all submerged water points----
@@ -61,9 +62,9 @@ saveRDS(ALT_violin, paste0('outputs/munged_12/EP_violin/ALT_violin_',reach_ID,'.
 
 # ----
 
-}
+#}
 
-dummy = lapply(g12_files,edit_function)
+#dummy = lapply(g12_files,edit_function)
 
 
 
