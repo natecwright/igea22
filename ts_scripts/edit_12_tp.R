@@ -9,7 +9,7 @@ setwd('C:/Users/ncw02/Downloads/IGEA/')
 
 
 g12_files = list.files('outputs/munged_12/TPs/')
-#input_file = "ALT_TP06.rds"
+#input_file = "ALT_TP17.rds"
 
 edit_function = function(input_file){
 
