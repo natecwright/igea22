@@ -9,14 +9,15 @@ setwd('C:/Users/ncw02/Downloads/IGEA/')
 
 
 g12_files = list.files('outputs/munged_12/TPs/')
-#input_file = "ALT_TP06.rds"
+#input_file = "ALT_TP17.rds"
 
 edit_function = function(input_file){
 
 reach_ID = substring(toupper(strsplit(input_file, "_")[[1]][2]), 1, 4)
 
 master = readRDS(paste0('outputs/munged_12/TPs/master_',reach_ID,'.rds'))
-alt_df = readRDS(paste0('outputs/munged_12/TPs/ALT_',reach_ID,'.rds'))
+alt_df = readRDS(paste0('outputs/munged_12/TPs/ALT_',reach_ID,'.rds'))%>%
+  filter(ALT > 0)
 
 
 # edit the data to exclude all submerged water points----
