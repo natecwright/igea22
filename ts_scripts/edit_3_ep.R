@@ -10,11 +10,11 @@ setwd('/Users/emmaboudreau/Documents/GitHub/igea22/')
 
 
 
-#g3_files = list.files('outputs/munged_3/EPs/')
-input_file = "ALT_3EP01.rds"
+g3_files = list.files('outputs/munged_3/EPs/ALT/')
+#input_file = "ALT_3EP01.rds"
 
 
-#edit_function = function(input_file) {
+edit_function = function(input_file) {
   
   reach_ID = substring(strsplit(input_file, "_")[[1]][2], 1, 5)
   
@@ -63,12 +63,13 @@ input_file = "ALT_3EP01.rds"
   
   
   # ----
-  ALT_violin = rbind(land_points, submerged_points)
-  #saveRDS(ALT_violin, paste0('outputs/munged_3/EP_violin/ALT_violin_',reach_ID,'.rds'))
+  ALT_violin = rbind(submerged_points, land_points)%>%
+    filter(!is.na(ALT))
+  saveRDS(ALT_violin, paste0('outputs/munged_3/EP_violin/ALT_violin_',reach_ID,'.rds'))
   
-#}
+}
 
-#lapply(g3_files,edit_function)
+lapply(g3_files,edit_function)
 
 
 

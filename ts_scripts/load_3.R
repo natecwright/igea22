@@ -167,7 +167,7 @@ alt_df = left_join(a_df, p_df, by=c('UID2','LWR'))%>%
 
 #saving master_df and alt_df as rds and adding 3 in front of reach_ID to distinguish group 3 from 1 and 2
 saveRDS(master_df, paste0('outputs/munged_3/master_',reach_ID,'.rds'))
-saveRDS(alt_df, paste0('outputs/munged_3/ALT_',reach_ID,'.rds'))
+saveRDS(alt_df, paste0('outputs/munged_3//ALT_',reach_ID,'.rds'))
 
 
 
