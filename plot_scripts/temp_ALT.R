@@ -18,18 +18,18 @@ file2=do.call(rbind, lapply(ep_early, readRDS))#file with temp
 
 
 new_df = left_join(file1,file2, by = 'UID2')%>%#join temp and xlabel
-  filter(Xlabel=='S')%>%
-  mutate(Temperature(C) = Temperature)
+  filter(Xlabel=='S')
+colnames(new_df)[colnames(new_df) == "Temperature (C)"] = "Temperature"#Change colname of one column
 
 temp_xlabel=function(new_df){
   
-p2=ggplot(new_df,aes(y=Temperature(C), x=ALT))+
+p2=ggplot(new_df,aes(y=Temperature, x=ALT))+
   geom_point(size=2.5)+
-  coord_cartesian(ylim=c(0,15))+
+  coord_cartesian(ylim=c(0,10))+
   theme_bw()+ #gets rid of grey background
-  xlab('Distance from Bank(m)')+
+  xlab('Active Layer Thickness(m)')+
   ylab('Temp(C)')+
-  labs(title = "Mean Active Layer Thickness of Pool Type and Season")+
+  labs(title = "Active Layer Thickness VS Temperature of Pool")+
   labs(colour = 'Stream and Season')+ #title of the legend
   theme(legend.text=element_text(size=14),
         legend.title=element_text(size=14),
