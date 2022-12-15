@@ -10,9 +10,9 @@ setwd('/Users/emmaboudreau/Documents/GitHub/igea22/')
 
 
 g3_files=list.files('raw_ts_data/group3.n')
-#input_file="3tp11_ts1.txt"
+input_file="3ep01_ts1.txt"
 
-read_function = function(input_file) {
+#read_function = function(input_file) {
   
   reach_ID = toupper(strsplit(input_file, "_")[[1]][1])
 
@@ -167,14 +167,14 @@ alt_df = left_join(a_df, p_df, by=c('UID2','LWR'))%>%
 
 #saving master_df and alt_df as rds and adding 3 in front of reach_ID to distinguish group 3 from 1 and 2
 saveRDS(master_df, paste0('outputs/munged_3/master_',reach_ID,'.rds'))
-saveRDS(alt_df, paste0('outputs/munged_3/ALT_',reach_ID,'.rds'))
+saveRDS(alt_df, paste0('outputs/munged_3//ALT_',reach_ID,'.rds'))
 
 
 
 
-}
+#}
 #lapply takes thing to be looped over in first position and the function in second position
-lapply(g3_files,read_function)
+#lapply(g3_files,read_function)
  #read_function(g3_files[1])
 
 
