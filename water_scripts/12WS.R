@@ -64,25 +64,23 @@ ours=rbind(our_df,our3)
 #comparing average isotope fractions for all 4 permutations of classification and season----
 avgEP_g12=our_df%>%
   filter(substr(Identifier_1, 1, 1) == "E")%>%
-  summarize(avgO=mean(avgO),avgH=mean(avgH))%>%
   mutate(perm="EP.g12")
 
 avgEP_g3=our3%>%
   filter(substr(Identifier_1, 1, 1) == "E")%>%
-  summarize(avgO=mean(avgO),avgH=mean(avgH))%>%
   mutate(perm="EP.g3")
 
 avgTP_g12=our_df%>%
   filter(substr(Identifier_1, 1, 1) == "T")%>%
-  summarize(avgO=mean(avgO),avgH=mean(avgH))%>%
   mutate(perm="TP.g12")
 
 avgTP_g3=our3%>%
   filter(substr(Identifier_1, 1, 1) == "T")%>%
-  summarize(avgO=mean(avgO),avgH=mean(avgH))%>%
   mutate(perm="TP.g3")
 
-avg_perm=rbind(avgEP_g12,avgEP_g3,avgTP_g12,avgTP_g3)
+avg_perm=rbind(avgEP_g12,avgEP_g3,avgTP_g12,avgTP_g3)%>%
+  group_by(perm)%>%
+  summarize(avgO=mean(avgO),avgH=mean(avgH))
 
 #read in NEON data----
 ground_df = read_xlsx('Raw_water_data/NEON_ground_111622.xlsx')%>%
