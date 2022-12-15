@@ -19,8 +19,8 @@ ALT_df=do.call(rbind,lapply(paste0('EPs/ALT/',ALT_ep),readRDS))
 saveRDS(ALT_df, '/Users/emmaboudreau/Documents/GitHub/igea22/outputs/munged_3/EP_ALT/EP_ALT.rds')
 
 ALT_mean=ALT_df%>%
-  mutate(Xlabel = 
-  group_by(Xlabel)%>%
+  mutate(number= substr(UID2,8,8))%>%
+  mutate(XSection= substr(UID2,9,9))%>%
   summarize(mean=mean(ALT, na.rm = TRUE))
 
 #function will start here
