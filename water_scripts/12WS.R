@@ -157,5 +157,3 @@ final_OKSR=from_OKSR%>%
   mutate(fH_precip=(groundH-ourH)/(groundH-precipH))%>%
   mutate(fH_ground=(ourH-precipH)/(groundH-precipH))
 
-#yet to try
-#join by doy within 365, created weighted column (inverse of days_apart), weighted.mean within summarize
