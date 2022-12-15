@@ -60,7 +60,29 @@ our_df = left_join(WS1_avg_df,metadata_df,"Identifier_1")
 #combining groups 1, 2, and 3----
 our3=readRDS('water_scripts/our3.rds')
 ours=rbind(our_df,our3)
-#group 3 identifiers have an underscore before the number
+
+#comparing average isotope fractions for all 4 permutations of classification and season----
+avgEP_g12=our_df%>%
+  filter(substr(Identifier_1, 1, 1) == "E")%>%
+  summarize(avgO=mean(avgO),avgH=mean(avgH))%>%
+  mutate(perm="EP.g12")
+
+avgEP_g3=our3%>%
+  filter(substr(Identifier_1, 1, 1) == "E")%>%
+  summarize(avgO=mean(avgO),avgH=mean(avgH))%>%
+  mutate(perm="EP.g3")
+
+avgTP_g12=our_df%>%
+  filter(substr(Identifier_1, 1, 1) == "T")%>%
+  summarize(avgO=mean(avgO),avgH=mean(avgH))%>%
+  mutate(perm="TP.g12")
+
+avgTP_g3=our3%>%
+  filter(substr(Identifier_1, 1, 1) == "T")%>%
+  summarize(avgO=mean(avgO),avgH=mean(avgH))%>%
+  mutate(perm="TP.g3")
+
+avg_perm=rbind(avgEP_g12,avgEP_g3,avgTP_g12,avgTP_g3)
 
 #read in NEON data----
 ground_df = read_xlsx('Raw_water_data/NEON_ground_111622.xlsx')%>%
