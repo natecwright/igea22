@@ -9,9 +9,9 @@ setwd('C:/Users/ncw02/Downloads/IGEA/')
 
 
 g12_files = list.files('outputs/munged_12/TPs/')
-#input_file = "ALT_TP17.rds"
+input_file = "ALT_TP06.rds"
 
-edit_function = function(input_file){
+#edit_function = function(input_file){
 
 reach_ID = substring(toupper(strsplit(input_file, "_")[[1]][2]), 1, 4)
 
@@ -46,14 +46,14 @@ submerged_points = anti_join(alt_df, land_points)%>%
 #create final df
 ALT_violin = rbind(land_points, submerged_points)
 
-saveRDS(ALT_violin, paste0('outputs/munged_12/TP_violin/ALT_violin_',reach_ID,'.rds'))
+#saveRDS(ALT_violin, paste0('outputs/munged_12/TP_violin/ALT_violin_',reach_ID,'.rds'))
 
 # ----
 
 
-}
+#}
 
-dummy = lapply(g12_files,edit_function)
+#dummy = lapply(g12_files,edit_function)
 
 
 
