@@ -56,6 +56,8 @@ submerged_points = anti_join(alt_df, land_points)%>%
 
 
 # 
+alt = mean(alt_df$ALT)
+
 ALT_violin = rbind(land_points, submerged_points)
 
 #saveRDS(ALT_violin, paste0('outputs/munged_12/EP_violin/ALT_violin_',reach_ID,'.rds'))
