@@ -5,6 +5,7 @@ library(dplyr)
 library(ggplot2)
 
 Mean_df=Giant_df%>%
+    filter(Xlabel=="S" | Xlabel==0 | Xlabel==1 | Xlabel==2 | Xlabel==3 | Xlabel==4)%>%
     group_by(Xlabel)%>%
     summarize(mean=mean(ALT, na.rm = TRUE))#creates df with mean values for each Xlabel
   #!!!!! dire. manual reorganization
@@ -16,12 +17,12 @@ Mean_df=Giant_df%>%
     geom_jitter()+#as.factor makes discreet colors for the points
     geom_boxplot(aes(fill=as.factor(Xlabel)), alpha = 0.5, colour="black")+
     #coord_cartesian(ylim=c(0,1))+ #early season
-    coord_cartesian(ylim=c(0,0.5))+ #late season
+    coord_cartesian(ylim=c(0,1))+ #late season
     stat_summary(fun = "mean",
                geom = "crossbar",
                width = 0.5,
                alpha=0.5)+
-    annotate(geom="text", x=Mean_df$Xlabel, y=0.5, label=paste('mu=',format(round(Mean_df$mean,2),nsmall=2)),
+    annotate(geom="text", x=Mean_df$Xlabel, y=1, label=paste('mu=',format(round(Mean_df$mean,2),nsmall=2)),
              color="black")+
     #stat_summary(fun = "mean",geom="text",label=mean_in_order,colour="black")+
     #scale_x_discrete(limits = c("S","0","1","2","3","4"))+#reorders the x-axis
@@ -30,8 +31,8 @@ Mean_df=Giant_df%>%
   theme_bw()+ #gets rid of grey background
   xlab('Distance from Bank(m)')+
   ylab('Active Layer Thickness(m)')+
-  labs(title = "Active Layer Thickness of Early Season Elliptical Pools")+#CHANGE ME
-  #labs(title = "Active Layer Thickness of Early Season Thaw Pits")+
+  labs(title = "Active Layer Thickness of Late Season Elliptical Pools")+#CHANGE ME
+  #labs(title = "Active Layer Thickness of Late Season Thaw Pits")+
   labs(colour = 'LRW')+ #title of the legend
   theme(legend.text=element_text(size=14),
         legend.title=element_text(size=14),
@@ -48,7 +49,7 @@ return(p3)
 
 #batch
 #reads and plots all of the files in this folder
-setwd('C:/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22/outputs/munged_12/EP_violin/') #CHANGE ME
+setwd('C:/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22/outputs/munged_3/EP_violin/') #CHANGE ME
 file_list=list.files(pattern="ALT_violin") #chooses the correct files to plot
 
 
