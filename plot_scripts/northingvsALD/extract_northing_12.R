@@ -5,9 +5,9 @@ library(ggplot2)
 setwd('C:/Users/ncw02/Downloads/IGEA/')
 
 g12_files = list.files('outputs/munged_12/TPs/')
-input_file = "ALT_TP13.rds"
+#input_file = "ALT_TP13.rds"
 
-#northing_function = function(input_file){
+northing_function = function(input_file){
 
 reach_ID = substring(toupper(strsplit(input_file, "_")[[1]][2]), 1, 4)
 
@@ -24,8 +24,8 @@ plot = master[1, 'Reach']%>%
   mutate(ALT = mean)%>%
   rename("Northing" = "Northing")
 
-#saveRDS(plot, paste0('outputs/munged_12/TP_northing/northing_',reach_ID,'.rds'))
+saveRDS(plot, paste0('outputs/munged_12/TP_northing/northing_',reach_ID,'.rds'))
 
-#}
+}
 
-#lapply(g12_files,northing_function)
+lapply(g12_files,northing_function)
