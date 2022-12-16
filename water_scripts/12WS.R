@@ -82,6 +82,11 @@ avg_perm=rbind(avgEP_g12,avgEP_g3,avgTP_g12,avgTP_g3)%>%
   group_by(perm)%>%
   summarize(avgO=mean(avgO),avgH=mean(avgH))
 
+saveRDS(avgEP_g12,'water_scripts/avgEP_g12.rds')
+saveRDS(avgEP_g3,'water_scripts/avgEP_g3.rds')
+saveRDS(avgTP_g12,'water_scripts/avgTP_g12.rds')
+saveRDS(avgTP_g3,'water_scripts/avgTP_g3.rds')
+
 #read in NEON data----
 ground_df = read_xlsx('Raw_water_data/NEON_ground_111622.xlsx')%>%
   select('Latitude','Longitude','Elevation_mabsl','Sample_ID','Collection_Date','d2H','d18O')%>%
