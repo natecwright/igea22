@@ -6,7 +6,7 @@ mean_line=function(rogerandtina){
   library(dplyr)
   library(ggplot2)
   
-  p3=ggplot(rogerandtina,aes(y=mean, x=Source))+
+  p4=ggplot(rogerandtina,aes(y=mean, x=Source))+
     geom_point(size=2.5)+
     #geom_line(aes(group=Source,col=Source))+#as.factor makes discreet colors for the points
     geom_errorbar(aes(ymin=mean-sd, ymax=mean+sd), width=.2)+
@@ -14,8 +14,8 @@ mean_line=function(rogerandtina){
     #scale_x_discrete(labels=c("S" = "Submerged in Water", "1" = "25","2" = "50", "3" = "75", "4" = "100"), limits = c("S","0","1","2","3","4"))+#renames the x axis
     theme_bw()+ #gets rid of grey background
     xlab('Stream Classification and Season')+
-    ylab('Oxygen Isotope Ratio')+
-    labs(title = "Mean Oxygen Isotope Ratios by Stream Classification and Season")+
+    ylab('Hydrogen Isotope Ratio')+
+    labs(title = "Mean Hydrogen Isotope Ratios by Stream Classification and Season")+
     #labs(colour = 'Stream and Season')+ #title of the legend
     theme(legend.text=element_text(size=14),
           legend.title=element_text(size=14),
@@ -25,7 +25,7 @@ mean_line=function(rogerandtina){
           plot.title = element_text(color="black", size=14, face="bold.italic"),
           legend.background = element_rect(fill=alpha('white',0.8)))
   
-  return(p3)
+  return(p4)
   
 }
 
@@ -37,19 +37,19 @@ setwd('C:/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Mun
 
 #find the means and sds
 ep_early_mean=(readRDS("avgEP_g12.rds"))%>%
-  summarize(mean=mean(avgO, na.rm = TRUE), sd=sd(avgO, na.rm = TRUE))%>%
+  summarize(mean=mean(avgH, na.rm = TRUE), sd=sd(avgH, na.rm = TRUE))%>%
   mutate(Source='EP Early')
 
 ep_late_mean=(readRDS("avgEP_g3.rds"))%>%
-  summarize(mean=mean(avgO, na.rm = TRUE), sd=sd(avgO, na.rm = TRUE))%>%
+  summarize(mean=mean(avgH, na.rm = TRUE), sd=sd(avgH, na.rm = TRUE))%>%
   mutate(Source='EP Late')
 
 tp_early_mean=(readRDS("avgTP_g12.rds"))%>%
-  summarize(mean=mean(avgO, na.rm = TRUE), sd=sd(avgO, na.rm = TRUE))%>%
+  summarize(mean=mean(avgH, na.rm = TRUE), sd=sd(avgH, na.rm = TRUE))%>%
   mutate(Source='TP Early')
 
 tp_late_mean=(readRDS("avgTP_g3.rds"))%>%
-  summarize(mean=mean(avgO, na.rm = TRUE), sd=sd(avgO, na.rm = TRUE))%>%
+  summarize(mean=mean(avgH, na.rm = TRUE), sd=sd(avgH, na.rm = TRUE))%>%
   mutate(Source='TP Late')
 
 final_df=rbind(ep_early_mean,ep_late_mean,tp_early_mean,tp_late_mean)
