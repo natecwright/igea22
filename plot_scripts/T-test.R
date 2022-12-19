@@ -14,16 +14,16 @@ setwd('/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge
 Sub=readRDS('avgEP_g12.rds')#%>%
   #filter(Xlabel==1 | Xlabel==2 | Xlabel==3 | Xlabel==4) #data set 1 to be compared in t test
   #filter(Xlabel==1)
-var(Sub$avgH)
+var(Sub$avgO)
 
-Notsub=readRDS('avgEP_g3.rds')#%>%
+Notsub=readRDS('avgTP_g12.rds')#%>%
   #filter(Xlabel=='S') #data set 2 to be compared
-var(Notsub$avgH)  
+var(Notsub$avgO)  
 
-result=t.test(Sub$avgH, Notsub$avgH, var.equal=F) #t test for the alt columns of two sets of data to be compared
+result=t.test(Sub$avgO, Notsub$avgO, var.equal=F) #t test for the alt columns of two sets of data to be compared
 
 p=result$p.value
-saveRDS(p, 'C:/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22/outputs/T_test/P_Values/Hydrogen_EPe_EPl_p.rds')
+saveRDS(p, 'C:/Users/Stella/OneDrive - University of Massachusetts/Documents/IGEA/Munge/igea22/outputs/T_test/P_Values/Oxygen_EPe_TPe_p.rds')
 
 
 
